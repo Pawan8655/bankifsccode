@@ -1,0 +1,20 @@
+{
+  "SAHE0000001": {
+    "BANK": "Sahebrao Deshmukh Co-operative Bank",
+    "IFSC": "SAHE0000001",
+    "BRANCH": "Sahebrao Deshmukh Co-operative Bank IMPS",
+    "CENTRE": "NA",
+    "DISTRICT": "NA",
+    "STATE": "MAHARASHTRA",
+    "ADDRESS": "NA",
+    "CONTACT": null,
+    "IMPS": true,
+    "CITY": "MUMBAI",
+    "UPI": false,
+    "NEFT": false,
+    "RTGS": false,
+    "MICR": null,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  }
+}

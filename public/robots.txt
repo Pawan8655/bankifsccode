@@ -1,0 +1,40 @@
+# robots.txt for IFSC Finder
+# https://ifscfinder.in
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://ifscfinder.in/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Allow all search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+# Block specific paths if needed
+Disallow: /api/
+Disallow: /_*

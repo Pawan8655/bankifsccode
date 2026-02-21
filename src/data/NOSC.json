@@ -1,0 +1,38 @@
+{
+  "NOSC0000MUM": {
+    "BANK": "Bank of Nova Scotia",
+    "IFSC": "NOSC0000MUM",
+    "BRANCH": "Bank of Nova Scotia IMPS",
+    "CENTRE": "MUMBAI",
+    "DISTRICT": "MUMBAI",
+    "STATE": "MAHARASHTRA",
+    "ADDRESS": "91-94, 3 NORTH AVENUE, MAKER MAXITY, BANDRA KURLA COMPLEX, MUMBAI 400051, INDIA",
+    "CONTACT": "+912266586931",
+    "IMPS": true,
+    "CITY": "MUMBAI",
+    "UPI": false,
+    "MICR": null,
+    "RTGS": true,
+    "NEFT": true,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  },
+  "NOSC000NEFT": {
+    "BANK": "Bank of Nova Scotia",
+    "IFSC": "NOSC000NEFT",
+    "BRANCH": "MUMBAI",
+    "ADDRESS": "POINT , MUMBAI - 21",
+    "STATE": "MAHARASHTRA",
+    "MICR": null,
+    "CONTACT": "+912266364000",
+    "UPI": false,
+    "NEFT": true,
+    "CITY": "MAHARASHTRA",
+    "CENTRE": "MUMBAI",
+    "DISTRICT": "MUMBAI",
+    "RTGS": false,
+    "IMPS": true,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  }
+}

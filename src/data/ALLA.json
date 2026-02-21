@@ -1,0 +1,20 @@
+{
+  "ALLA0888888": {
+    "BANK": "Allahabad Bank",
+    "IFSC": "ALLA0888888",
+    "BRANCH": "Allahabad Bank IMPS",
+    "CENTRE": "NA",
+    "DISTRICT": "NA",
+    "STATE": "MAHARASHTRA",
+    "ADDRESS": "NA",
+    "CONTACT": null,
+    "IMPS": true,
+    "CITY": "MUMBAI",
+    "UPI": false,
+    "NEFT": false,
+    "RTGS": false,
+    "MICR": null,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  }
+}

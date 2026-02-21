@@ -1,0 +1,38 @@
+{
+  "IBBK0000001": {
+    "BANK": "PT Bank Maybank Indonesia TBK",
+    "IFSC": "IBBK0000001",
+    "MICR": "400229258",
+    "BRANCH": "RTGS-HO",
+    "ADDRESS": "ONE INDIABULLS CENTRE, TOWER 2, WING B 702, 7TH FLOOR, ELPHINSTONE ROAD (WEST),MUMBAI   400013",
+    "STATE": "MAHARASHTRA",
+    "CONTACT": "+912267303411",
+    "UPI": false,
+    "RTGS": true,
+    "CITY": "MUMBAI",
+    "CENTRE": "MUMBAI",
+    "DISTRICT": "MUMBAI",
+    "NEFT": true,
+    "IMPS": true,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  },
+  "IBBK00000SC": {
+    "BANK": "PT Bank Maybank Indonesia TBK",
+    "IFSC": "IBBK00000SC",
+    "BRANCH": "HEAD OFFICE",
+    "ADDRESS": "ONE INDIABULLS CENTER,TOWER 2,WING B,702,7TH FLOOR,ELPHINSTONE ROAD WEST MUMBAI400 013",
+    "STATE": "MAHARASHTRA",
+    "MICR": null,
+    "CONTACT": null,
+    "UPI": false,
+    "NEFT": true,
+    "CITY": "MUMBAI",
+    "CENTRE": "MUMBAI",
+    "DISTRICT": "MUMBAI",
+    "RTGS": false,
+    "IMPS": true,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  }
+}

@@ -1,0 +1,5 @@
+- [x] Add search state and input field to Blogs.tsx
+- [x] Implement filtering logic for blogs based on search term
+- [x] Update pagination to work with filtered blogs
+- [x] Reset page to 1 on search change
+- [x] Ensure immediate display without loading

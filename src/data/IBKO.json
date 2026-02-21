@@ -1,0 +1,38 @@
+{
+  "IBKO0000001": {
+    "BANK": "Industrial Bank of Korea",
+    "IFSC": "IBKO0000001",
+    "MICR": "110744001",
+    "BRANCH": "RTGS-HO",
+    "ADDRESS": "OFFICE NO 403 4TH FLOOR WORLDMARK2 ASSET8 HOSPITALITY DISTRICT AEROCITY NEW DELHI 110037",
+    "STATE": "DELHI",
+    "CONTACT": "+911140768000",
+    "UPI": false,
+    "RTGS": true,
+    "CITY": "NEW DELHI",
+    "CENTRE": "NEW DELHI",
+    "DISTRICT": "NEW DELHI",
+    "NEFT": true,
+    "IMPS": true,
+    "SWIFT": null,
+    "ISO3166": "IN-DL"
+  },
+  "IBKO00000SC": {
+    "BANK": "Industrial Bank of Korea",
+    "IFSC": "IBKO00000SC",
+    "BRANCH": "NEW DELHI BRANCH",
+    "ADDRESS": "OFFICE NO 403 4TH FLOOR WORLDMARK2 ASSET 8 HOSPITALITY DISTRICT AEROCITY NEW DELHI 110037",
+    "STATE": "DELHI",
+    "MICR": null,
+    "CONTACT": "+911140768000",
+    "UPI": false,
+    "NEFT": true,
+    "CITY": "NEW DELHI",
+    "CENTRE": "NEW DELHI",
+    "DISTRICT": "NEW DELHI",
+    "RTGS": false,
+    "IMPS": true,
+    "SWIFT": null,
+    "ISO3166": "IN-DL"
+  }
+}

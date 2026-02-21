@@ -1,0 +1,19 @@
+{
+  "ADCB0000001": {
+    "BANK": "Abu Dhabi Commercial Bank",
+    "IFSC": "ADCB0000001",
+    "BRANCH": "Abu Dhabi Commercial Bank IMPS",
+    "CENTRE": "NA",
+    "DISTRICT": "NA",
+    "STATE": "NA",
+    "ADDRESS": "NA",
+    "CONTACT": null,
+    "IMPS": true,
+    "CITY": "NA",
+    "UPI": false,
+    "NEFT": false,
+    "RTGS": false,
+    "MICR": null,
+    "SWIFT": null
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "PRTH0000001": {
+    "BANK": "Prathama Bank",
+    "IFSC": "PRTH0000001",
+    "BRANCH": "Prathama Bank IMPS",
+    "CENTRE": "NA",
+    "DISTRICT": "NA",
+    "STATE": "NA",
+    "ADDRESS": "NA",
+    "CONTACT": null,
+    "IMPS": true,
+    "UPI": true,
+    "NEFT": false,
+    "RTGS": false,
+    "MICR": null
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "CORP0000920": {
+    "BANK": "Corporation Bank",
+    "IFSC": "CORP0000920",
+    "BRANCH": "Corporation Bank IMPS",
+    "CENTRE": "NA",
+    "DISTRICT": "NA",
+    "STATE": "MAHARASHTRA",
+    "ADDRESS": "NA",
+    "CONTACT": null,
+    "IMPS": true,
+    "CITY": "MUMBAI",
+    "UPI": false,
+    "NEFT": false,
+    "RTGS": false,
+    "MICR": null,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  }
+}

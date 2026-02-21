@@ -1,0 +1,38 @@
+{
+  "BNSB0000001": {
+    "BANK": "Bhagini Nivedita Sahakari Bank Pune",
+    "IFSC": "BNSB0000001",
+    "MICR": "411272003",
+    "BRANCH": "RTGS-HO",
+    "ADDRESS": "NIVEDITA BAHAVAN,CTS NO.34/7,FINAL PLOT NO 35/7B,PRABHAT ROAD,LANE NO.8,ERANDWANE,PUNE - 411004",
+    "STATE": "MAHARASHTRA",
+    "CONTACT": "+912025447619",
+    "UPI": false,
+    "RTGS": true,
+    "CITY": "PUNE",
+    "CENTRE": "PUNE",
+    "DISTRICT": "PUNE",
+    "NEFT": true,
+    "IMPS": true,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  },
+  "BNSB0000002": {
+    "BANK": "Bhagini Nivedita Sahakari Bank Pune",
+    "IFSC": "BNSB0000002",
+    "MICR": "411272002",
+    "BRANCH": "NARAYAN PETH",
+    "ADDRESS": "SANCHETI CHAMBERS,OPP.VIJAY TALKIES,LAXMI ROAD,PUNE 411030",
+    "STATE": "MAHARASHTRA",
+    "CONTACT": "+912024458632",
+    "UPI": false,
+    "RTGS": true,
+    "CITY": "PUNE",
+    "CENTRE": "PUNE",
+    "DISTRICT": "PUNE",
+    "NEFT": true,
+    "IMPS": true,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "PMCB0000001": {
+    "BANK": "Punjab & Maharashtra Co-operative Bank",
+    "IFSC": "PMCB0000001",
+    "BRANCH": "Punjab & Maharashtra Co-operative Bank IMPS",
+    "CENTRE": "NA",
+    "DISTRICT": "NA",
+    "STATE": "NA",
+    "ADDRESS": "NA",
+    "CONTACT": null,
+    "IMPS": true,
+    "UPI": true,
+    "NEFT": false,
+    "RTGS": false,
+    "MICR": null
+  }
+}

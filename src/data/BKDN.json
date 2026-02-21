@@ -1,0 +1,20 @@
+{
+  "BKDN0RTGSSC": {
+    "BANK": "Dena Bank",
+    "IFSC": "BKDN0RTGSSC",
+    "BRANCH": "Dena Bank IMPS",
+    "CENTRE": "NA",
+    "DISTRICT": "NA",
+    "STATE": "MAHARASHTRA",
+    "ADDRESS": "NA",
+    "CONTACT": null,
+    "IMPS": true,
+    "CITY": "MUMBAI",
+    "UPI": false,
+    "NEFT": false,
+    "RTGS": false,
+    "MICR": null,
+    "SWIFT": null,
+    "ISO3166": "IN-MH"
+  }
+}

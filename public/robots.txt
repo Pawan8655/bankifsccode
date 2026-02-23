@@ -1,11 +1,11 @@
-# robots.txt for IFSC Finder
-# https://ifscfinder.in
+# robots.txt for Bank IFSC Code Finder
+# https://www.bankifsccode.biz
 
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://ifscfinder.in/sitemap.xml
+Sitemap: https://www.bankifsccode.biz/sitemap.xml
 
 # Crawl-delay for respectful crawling
 Crawl-delay: 1

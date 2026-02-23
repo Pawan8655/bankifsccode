@@ -1,4 +1,4 @@
-# 🏦 India's Trusted IFSC Finder
+# 🏦 India's Trusted Bank Ifsc Code Finder
 
 A comprehensive, fast, and user-friendly web application for finding Indian Financial System Codes (IFSC) for all banks across India. Built with modern web technologies, this project ensures accuracy, speed, and a premium user experience.
 

@@ -38,8 +38,8 @@ Follow these steps to set up the project locally.
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/yourusername/ifsc-finder.git
-    cd ifsc-finder
+    git clone (https://github.com/Pawan8655/bankifsccode.git)
+cd ifsc-finder
     ```
 
 2.  **Install dependencies**

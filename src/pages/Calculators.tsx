@@ -1,33 +1,45 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { Calculator } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { SEO } from '@/components/SEO';
+import { TOOL_CATALOG, TOOL_CATEGORY_ORDER } from '@/data/toolCatalog';
 
 export default function Calculators() {
-    return (
-        <div className="min-h-screen flex flex-col bg-background">
-            <Header />
-            <main className="flex-1">
-                <div className="container mx-auto px-4 py-8">
-                    <Breadcrumbs items={[{ label: 'Banking Calculator Tools' }]} />
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="50+ Financial Calculators India | bankifsccode.biz tools"
+        description="Explore 50+ financial tools: EMI, SIP, FD, RD, tax, GST, loan, investment, business and utility calculators for India."
+        path="/tools"
+      />
+      <Header />
+      <main className="flex-1">
+        <section className="container mx-auto px-4 py-8">
+          <Breadcrumbs items={[{ label: 'Financial Tools' }]} />
+          <h1 className="text-4xl font-bold mt-4">50+ Financial Tools for India</h1>
+          <p className="mt-3 text-muted-foreground max-w-4xl">Every tool includes practical guidance, live output, internal linking, and SEO-friendly content for real-world planning. Start with bank IFSC code lookup, then calculate loans, taxes, investments, and business metrics in one place.</p>
 
-                    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-                        <div className="p-6 rounded-full bg-primary/10 mb-6 animate-pulse">
-                            <Calculator className="h-16 w-16 text-primary" />
-                        </div>
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-4">
-                            Banking Calculator Tools
-                        </h1>
-                        <p className="text-xl text-muted-foreground">
-                            Coming Soon...
-                        </p>
-                        <p className="mt-4 max-w-md text-sm text-muted-foreground/80">
-                            We are working hard to bring you a comprehensive suite of banking calculators including EMI, FD, RD, and more. Stay tuned!
-                        </p>
-                    </div>
+          {TOOL_CATEGORY_ORDER.map((category) => {
+            const tools = TOOL_CATALOG.filter((tool) => tool.category === category);
+            if (!tools.length) return null;
+            return (
+              <section key={category} className="mt-10">
+                <h2 className="text-2xl font-semibold mb-4">{category}</h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {tools.map((tool) => (
+                    <Link key={tool.slug} to={`/${tool.slug}`} className="rounded-xl border bg-card p-4 hover:border-primary/40 transition-colors">
+                      <h3 className="font-semibold">{tool.title}</h3>
+                      <p className="text-sm text-muted-foreground mt-2">{tool.description}</p>
+                    </Link>
+                  ))}
                 </div>
-            </main>
-            <Footer />
-        </div>
-    );
+              </section>
+            );
+          })}
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
 }

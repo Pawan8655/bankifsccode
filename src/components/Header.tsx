@@ -1,6 +1,6 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
-import { Menu, X, Home, Building2, Info, Mail, Calculator, BookOpen } from 'lucide-react';
+import { Menu, X, Home, Building2, Info, Mail, Calculator, BookOpen, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/logo.jpeg';
@@ -8,7 +8,9 @@ import { cn } from '@/lib/utils';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [ifscQuery, setIfscQuery] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navLinks = [
     { to: '/', label: 'Home', icon: Home },
@@ -35,8 +37,28 @@ export function Header() {
             </div>
           </Link>
 
+          <form
+            className="hidden md:flex items-center border rounded-lg px-3 py-1.5 w-72 bg-background"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (ifscQuery.trim()) {
+                navigate(`/branch/${encodeURIComponent(ifscQuery.trim().toUpperCase())}`);
+                setIfscQuery('');
+              }
+            }}
+          >
+            <Search className="h-4 w-4 text-muted-foreground mr-2" />
+            <input
+              value={ifscQuery}
+              onChange={(e) => setIfscQuery(e.target.value)}
+              placeholder="Search IFSC (e.g. SBIN0001234)"
+              className="w-full bg-transparent outline-none text-sm"
+              aria-label="Search IFSC code"
+            />
+          </form>
+
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => {
               const isActive = location.pathname === link.to;
               return (

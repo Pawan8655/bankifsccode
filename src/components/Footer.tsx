@@ -12,6 +12,9 @@ export function Footer() {
     { label: 'Contact Us', to: '/contact' },
     { label: 'Terms & Conditions', to: '/terms' },
     { label: 'Privacy Policy', to: '/privacy' },
+    { label: 'Disclaimer', to: '/disclaimer' },
+    { label: 'EMI Calculator', to: '/emi-calculator' },
+    { label: 'SIP Calculator', to: '/sip-calculator' },
   ];
 
   const popularBanks = [

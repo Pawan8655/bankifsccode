@@ -1,4 +1,4 @@
-import { Search, Building2, TrendingUp, ArrowRight, GitBranch, Sparkles, Shield, Zap } from 'lucide-react';
+import { Search, Building2, TrendingUp, ArrowRight, GitBranch, Sparkles, Shield, Zap, Calculator, BookOpen } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import logo from '@/assets/logo.png';
+import { SEO } from '@/components/SEO';
 
 // Famous banks in India with priority order
 const FAMOUS_BANKS = [
@@ -121,6 +122,11 @@ export default function Index() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Bank IFSC Code Search & Financial Calculators India | bankifsccode.biz"
+        description="Search any bank IFSC code instantly and use bankifsccode.biz tools like EMI and SIP calculators. Explore financial calculators India users trust."
+        path="/"
+      />
       <Header />
 
       <main className="flex-1">
@@ -389,6 +395,56 @@ export default function Index() {
                   <li>Online banking and mobile banking transfers</li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-12 sm:py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6">Featured Tools</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Link to="/emi-calculator" className="rounded-xl border p-5 hover:bg-primary/5 transition-colors">
+                <h3 className="font-semibold flex items-center gap-2"><Calculator className="h-4 w-4 text-primary" /> EMI Calculator</h3>
+                <p className="text-sm text-muted-foreground mt-2">Calculate monthly EMI, total interest, and repayment with chart-based insights.</p>
+              </Link>
+              <Link to="/sip-calculator" className="rounded-xl border p-5 hover:bg-primary/5 transition-colors">
+                <h3 className="font-semibold flex items-center gap-2"><TrendingUp className="h-4 w-4 text-green-600" /> SIP Calculator</h3>
+                <p className="text-sm text-muted-foreground mt-2">Estimate long-term wealth growth for monthly SIP investments in India.</p>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-12 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6">Categories</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                ['Bank IFSC Code Lookup', '/banks'],
+                ['Loan Calculators', '/emi-calculator'],
+                ['Investment Calculators', '/sip-calculator'],
+                ['Financial Education Blogs', '/blogs'],
+              ].map(([title, href]) => (
+                <Link key={title} to={href} className="rounded-xl border bg-background p-4 font-medium hover:border-primary/40">{title}</Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-12 sm:py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2"><BookOpen className="h-5 w-5 text-primary" /> Latest Financial Articles</h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                ['How to verify a bank IFSC code before transfer', '/blogs'],
+                ['EMI vs tenure: how to reduce total interest paid', '/emi-calculator'],
+                ['SIP planning for long-term financial goals in India', '/sip-calculator'],
+              ].map(([title, href]) => (
+                <Link key={title} to={href} className="rounded-xl border p-5 hover:shadow-sm transition-shadow">
+                  <h3 className="font-semibold">{title}</h3>
+                  <p className="text-sm text-muted-foreground mt-2">Read practical guidance and apply with our free tools.</p>
+                </Link>
+              ))}
             </div>
           </div>
         </section>

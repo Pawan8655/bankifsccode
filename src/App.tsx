@@ -17,6 +17,7 @@ import Privacy from "./pages/Privacy";
 import EmiCalculator from "./pages/EmiCalculator";
 import SipCalculator from "./pages/SipCalculator";
 import Disclaimer from "./pages/Disclaimer";
+import GenericToolPage from "./pages/GenericToolPage";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/:toolSlug" element={<GenericToolPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

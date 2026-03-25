@@ -9,7 +9,7 @@ import { Loader } from '@/components/Loader';
 import { FavoritesSection } from '@/components/FavoritesSection';
 import { SearchHistorySection } from '@/components/SearchHistorySection';
 import { useIFSCData } from '@/hooks/useIFSCData';
-import { getUniqueBanks, getOverallStats, getStatesForBank } from '@/lib/csvParser';
+import { getUniqueBanks, getOverallStats } from '@/lib/csvParser';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -92,14 +92,6 @@ export default function Index() {
     if (!indices) return [];
 
     return indices.banks.map((bank, index) => {
-      const statesSet = indices.statesMap.get(bank);
-      const stateCount = statesSet ? statesSet.size : 0;
-
-      // Approximate branch count or calculate heavy?
-      // Let's use the same traversal logic or maybe for "All Banks" just showing top 12 initially?
-      // The UI slices 0-12. So we can just map all of them, but calculation for ALL banks (Wait, there are hundreds) might be slow.
-      // Actually unique banks count is probably ~100-200. Calculating stats for 200 banks via map traversal is fast.
-
       let branchCount = 0;
       if (indices.branchesMap.has(bank)) {
         const bankStates = indices.branchesMap.get(bank)!;
@@ -113,10 +105,9 @@ export default function Index() {
       return {
         name: bank,
         branchCount,
-        stateCount,
         colorClass: BANK_COLORS[index % BANK_COLORS.length],
       };
-    }).sort((a, b) => b.branchCount - a.branchCount);
+    }).sort((a, b) => b.branchCount - a.branchCount).slice(0, 24);
   }, [indices]);
 
 
@@ -315,7 +306,7 @@ export default function Index() {
               </div>
             )}
 
-            {!loading && banks.length > 12 && (
+            {!loading && banks.length > allBanksData.length && (
               <div className="mt-8 text-center">
                 <Link to="/banks">
                   <Button size="lg" className="gap-2 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg">

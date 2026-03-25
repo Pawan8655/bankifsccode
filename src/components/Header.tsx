@@ -38,7 +38,7 @@ export function Header() {
           </Link>
 
           <form
-            className="hidden lg:flex items-center border rounded-lg px-3 py-1.5 w-72 bg-background"
+            className="hidden md:flex items-center border rounded-lg px-3 py-1.5 w-72 bg-background"
             onSubmit={(e) => {
               e.preventDefault();
               if (ifscQuery.trim()) {
@@ -58,7 +58,7 @@ export function Header() {
           </form>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => {
               const isActive = location.pathname === link.to;
               return (

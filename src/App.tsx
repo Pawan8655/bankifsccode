@@ -14,6 +14,11 @@ import Calculators from "./pages/Calculators";
 import Blogs from "./pages/Blogs";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import EmiCalculator from "./pages/EmiCalculator";
+import SipCalculator from "./pages/SipCalculator";
+import Disclaimer from "./pages/Disclaimer";
+import GenericToolPage from "./pages/GenericToolPage";
+import { MobileBottomNav } from "./components/MobileBottomNav";
 
 const queryClient = new QueryClient();
 
@@ -31,14 +36,19 @@ const App = () => (
           <Route path="/bank/:bankName/:stateName/:cityName" element={<BankDetails />} />
           <Route path="/branch/:ifsc" element={<BranchPage />} />
           <Route path="/tools" element={<Calculators />} />
+          <Route path="/emi-calculator" element={<EmiCalculator />} />
+          <Route path="/sip-calculator" element={<SipCalculator />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/:toolSlug" element={<GenericToolPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <MobileBottomNav />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

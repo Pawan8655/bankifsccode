@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, ExternalLink, Building2, Facebook, Instagram, X } from 'lucide-react';
+import { Mail, MapPin, ExternalLink, Building2 } from 'lucide-react';
 import logo from '@/assets/logo.jpeg';
 
 export function Footer() {
@@ -12,6 +12,9 @@ export function Footer() {
     { label: 'Contact Us', to: '/contact' },
     { label: 'Terms & Conditions', to: '/terms' },
     { label: 'Privacy Policy', to: '/privacy' },
+    { label: 'Disclaimer', to: '/disclaimer' },
+    { label: 'EMI Calculator', to: '/emi-calculator' },
+    { label: 'SIP Calculator', to: '/sip-calculator' },
   ];
 
   const popularBanks = [
@@ -37,29 +40,7 @@ export function Footer() {
               India's most trusted platform for finding bank IFSC codes.
               Quick, accurate, and always up-to-date.
             </p>
-            <div className="flex items-center gap-3">
-              <a
-                href="#"
-                className="p-2 rounded-full bg-muted hover:bg-primary/10 transition-colors group"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-4 w-4 text-black group-hover:text-primary transition-colors" />
-              </a>
-              <a
-                href="#"
-                className="p-2 rounded-full bg-muted hover:bg-primary/10 transition-colors group"
-                aria-label="Twitter"
-              >
-                <X className="h-4 w-4 text-black group-hover:text-primary transition-colors" />
-              </a>
-              <a
-                href="#"
-                className="p-2 rounded-full bg-muted hover:bg-primary/10 transition-colors group"
-                aria-label="Facebook"
-              >
-                <Facebook className="h-4 w-4 text-black group-hover:text-primary transition-colors" />
-              </a>
-            </div>
+            <p className="text-xs text-muted-foreground">Built for simple, fast and reliable financial planning.</p>
           </div>
 
           {/* Quick Links */}
@@ -129,9 +110,7 @@ export function Footer() {
             <span className="font-bold text-red-800">Disclaimer:</span> All information provided on this website is for informational purposes only. While we strive to ensure accuracy based on RBI data, we are not responsible for any errors, omissions, or financial losses arising from the use of this information. We are not affiliated with any bank. Users are strongly advised to verify details directly with the respective bank before initiating any transactions. We do not ask for OTPs or sensitive personal information; please be aware of banking frauds.
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <p className="text-sm text-black text-center">
-              © {new Date().getFullYear()} Bank IFSC Code. Built by Pawan Yadav  from Siddharth Nagar, Uttar Pradesh, India
-            </p>
+            <p className="text-sm text-black text-center">© {new Date().getFullYear()} bankifsccode.biz</p>
           </div>
         </div>
       </div>

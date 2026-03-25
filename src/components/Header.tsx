@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ThemeToggle } from './ThemeToggle';
 import { Menu, X, Home, Building2, Info, Mail, Calculator, BookOpen, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';

@@ -120,6 +120,7 @@ export default function EmiCalculator() {
               <div className="space-y-5">
                 <label className="block">
                   <span className="font-medium">Loan Amount </span>
+                  <span className="font-medium">Loan Amount (₹)</span>
                   <input type="number" value={loanAmount} onChange={(e) => setLoanAmount(Number(e.target.value))} className="w-full mt-2 rounded-md border px-3 py-2" />
                 </label>
                 <label className="block">
@@ -135,6 +136,9 @@ export default function EmiCalculator() {
                 <p><strong>Monthly EMI:</strong> {emi.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
                 <p><strong>Total Interest:</strong> {totalInterest.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
                 <p><strong>Total Payment:</strong> {totalPayment.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                <p><strong>Monthly EMI:</strong> ₹{emi.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                <p><strong>Total Interest:</strong> ₹{totalInterest.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                <p><strong>Total Payment:</strong> ₹{totalPayment.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
               </div>
             </div>
             <div className="rounded-xl border p-6 bg-card h-[360px]">

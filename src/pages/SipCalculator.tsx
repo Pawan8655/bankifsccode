@@ -64,6 +64,7 @@ export default function SipCalculator() {
           y: {
             ticks: {
               callback: (value: number) => `${Number(value).toLocaleString('en-IN')}`,
+              callback: (value: number) => `₹${Number(value).toLocaleString('en-IN')}`,
             },
           },
         },
@@ -130,6 +131,7 @@ export default function SipCalculator() {
               <div className="space-y-5">
                 <label className="block">
                   <span className="font-medium">Monthly Investment </span>
+                  <span className="font-medium">Monthly Investment (₹)</span>
                   <input type="number" value={monthlyInvestment} onChange={(e) => setMonthlyInvestment(Number(e.target.value))} className="w-full mt-2 rounded-md border px-3 py-2" />
                 </label>
                 <label className="block">
@@ -145,6 +147,9 @@ export default function SipCalculator() {
                 <p><strong>Total Invested:</strong> {invested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
                 <p><strong>Estimated Returns:</strong> {estimatedReturns.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
                 <p><strong>Maturity Value:</strong> {maturityValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                <p><strong>Total Invested:</strong> ₹{invested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                <p><strong>Estimated Returns:</strong> ₹{estimatedReturns.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                <p><strong>Maturity Value:</strong> ₹{maturityValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
               </div>
             </div>
             <div className="rounded-xl border p-6 bg-card h-[360px]">

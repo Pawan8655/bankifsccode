@@ -9,6 +9,7 @@ import { findToolBySlug } from '@/data/toolCatalog';
 function toNumber(value: string | number) {
   const sanitized = typeof value === 'string' ? value.replace(/,/g, '') : value;
   const numeric = typeof sanitized === 'number' ? sanitized : Number(sanitized);
+  const numeric = typeof value === 'number' ? value : Number(value);
   return Number.isFinite(numeric) ? numeric : 0;
 }
 
@@ -27,6 +28,11 @@ function calculate(slug: string, values: Record<string, string | number>) {
       return `Simple interest: ${(p * r * y).toLocaleString('en-IN', { maximumFractionDigits: 0 })}; total: ${(p + p * r * y).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     case 'fd-calculator':
       return `FD maturity estimate: ${(p * Math.pow(1 + r / 4, y * 4)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+      return `Estimated future value: ₹${(toNumber(values.amount || values.principal) * Math.pow(1 + r, y)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'simple-interest-calculator':
+      return `Simple interest: ₹${(p * r * y).toLocaleString('en-IN', { maximumFractionDigits: 0 })}; total: ₹${(p + p * r * y).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'fd-calculator':
+      return `FD maturity estimate: ₹${(p * Math.pow(1 + r / 4, y * 4)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     case 'rd-calculator': {
       const monthly = toNumber(values.monthly);
       const months = y * 12;
@@ -43,12 +49,25 @@ function calculate(slug: string, values: Record<string, string | number>) {
       return `Estimated annual interest rate: ${((toNumber(values.interest) / toNumber(values.principal)) / toNumber(values.years) * 100).toFixed(2)}%`;
     case 'gst-calculator':
       return `GST amount: ${(toNumber(values.amount) * toNumber(values.rate) / 100).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+      return `RD maturity estimate: ₹${fv.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    }
+    case 'loan-eligibility-calculator': {
+      const eligibleEmi = Math.max(0, toNumber(values.income) * 0.5 - toNumber(values.obligations));
+      return `Approximate eligible loan amount: ₹${(eligibleEmi * 12 * toNumber(values.years)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    }
+    case 'loan-prepayment-calculator':
+      return `Outstanding after prepayment: ₹${Math.max(0, toNumber(values.outstanding) - toNumber(values.prepay)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'interest-rate-calculator':
+      return `Estimated annual interest rate: ${((toNumber(values.interest) / toNumber(values.principal)) / toNumber(values.years) * 100).toFixed(2)}%`;
+    case 'gst-calculator':
+      return `GST amount: ₹${(toNumber(values.amount) * toNumber(values.rate) / 100).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
     case 'currency-converter':
       return `Converted value: ${(toNumber(values.amount) * toNumber(values.rate)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
     case 'credit-card-emi-calculator': {
       const mr = r / 12;
       const emi = toNumber(values.amount) * mr * Math.pow(1 + mr, m) / (Math.pow(1 + mr, m) - 1);
       return `Monthly EMI: ${emi.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+      return `Monthly EMI: ₹${emi.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     }
     case 'home-loan-calculator':
     case 'personal-loan-calculator':
@@ -58,11 +77,13 @@ function calculate(slug: string, values: Record<string, string | number>) {
       const mr = r / 12;
       const emi = p * mr * Math.pow(1 + mr, months) / (Math.pow(1 + mr, months) - 1);
       return `Monthly EMI estimate: ${emi.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+      return `Monthly EMI estimate: ₹${emi.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     }
     case 'stock-return-calculator': {
       const gain = (toNumber(values.sell) - toNumber(values.buy)) * toNumber(values.qty);
       const pct = ((toNumber(values.sell) - toNumber(values.buy)) / toNumber(values.buy)) * 100;
       return `Gain/Loss: ${gain.toLocaleString('en-IN', { maximumFractionDigits: 0 })} (${pct.toFixed(2)}%)`;
+      return `Gain/Loss: ₹${gain.toLocaleString('en-IN', { maximumFractionDigits: 0 })} (${pct.toFixed(2)}%)`;
     }
     case 'cagr-calculator':
       return `CAGR: ${(Math.pow(toNumber(values.end) / toNumber(values.start), 1 / y) * 100 - 100).toFixed(2)}%`;
@@ -70,11 +91,15 @@ function calculate(slug: string, values: Record<string, string | number>) {
       return `Future value after inflation: ${(toNumber(values.amount) * Math.pow(1 + toNumber(values.inflation) / 100, y)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     case 'retirement-planner':
       return `Target annual expense at retirement: ${(toNumber(values.monthlyExpense) * 12 * Math.pow(1 + toNumber(values.inflation) / 100, y)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+      return `Future value after inflation: ₹${(toNumber(values.amount) * Math.pow(1 + toNumber(values.inflation) / 100, y)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'retirement-planner':
+      return `Target annual expense at retirement: ₹${(toNumber(values.monthlyExpense) * 12 * Math.pow(1 + toNumber(values.inflation) / 100, y)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     case 'ppf-calculator':
     case 'sukanya-samriddhi-calculator': {
       const yearly = toNumber(values.yearly);
       const fv = yearly * ((Math.pow(1 + r, y) - 1) / r) * (1 + r);
       return `Estimated maturity corpus: ${fv.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+      return `Estimated maturity corpus: ₹${fv.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     }
     case 'nps-calculator': {
       const monthly = toNumber(values.monthly);
@@ -97,6 +122,22 @@ function calculate(slug: string, values: Record<string, string | number>) {
       const contribution = toNumber(values.salary) * 0.24;
       const fv = contribution * 12 * ((Math.pow(1 + r, y) - 1) / r);
       return `Estimated EPF corpus: ${fv.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+      return `Estimated NPS corpus: ₹${fv.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    }
+    case 'income-tax-calculator-india':
+      return `Estimated taxable income: ₹${Math.max(0, toNumber(values.income) - toNumber(values.deduction)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'salary-calculator':
+      return `Estimated monthly in-hand: ₹${((toNumber(values.ctc) - toNumber(values.deduction)) / 12).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'hra-calculator': {
+      const eligible = Math.min(toNumber(values.hra), toNumber(values.rent) - toNumber(values.basic) * 0.1, toNumber(values.basic) * 0.5);
+      return `Approximate monthly HRA exemption: ₹${Math.max(0, eligible).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    }
+    case 'gratuity-calculator':
+      return `Estimated gratuity: ₹${(toNumber(values.salary) * 15 / 26 * toNumber(values.years)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'epf-calculator': {
+      const contribution = toNumber(values.salary) * 0.24;
+      const fv = contribution * 12 * ((Math.pow(1 + r, y) - 1) / r);
+      return `Estimated EPF corpus: ₹${fv.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     }
     case 'profit-margin-calculator':
       return `Profit margin: ${(((toNumber(values.revenue) - toNumber(values.cost)) / toNumber(values.revenue)) * 100).toFixed(2)}%`;
@@ -110,6 +151,11 @@ function calculate(slug: string, values: Record<string, string | number>) {
       return `Net worth: ${(toNumber(values.assets) - toNumber(values.liabilities)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     case 'budget-planner':
       return `Monthly balance: ${(toNumber(values.income) - toNumber(values.expense)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+      return `Net GST payable: ₹${Math.max(0, toNumber(values.output) - toNumber(values.input)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'net-worth-calculator':
+      return `Net worth: ₹${(toNumber(values.assets) - toNumber(values.liabilities)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'budget-planner':
+      return `Monthly balance: ₹${(toNumber(values.income) - toNumber(values.expense)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
     case 'savings-goal-calculator': {
       const mr = toNumber(values.rate) / 12 / 100;
       const n = toNumber(values.years) * 12;
@@ -122,12 +168,21 @@ function calculate(slug: string, values: Record<string, string | number>) {
       return `Loan A total: ${(toNumber(values.emiA) * toNumber(values.months)).toLocaleString('en-IN')} vs Loan B total: ${(toNumber(values.emiB) * toNumber(values.months)).toLocaleString('en-IN')}`;
     case 'investment-comparison-tool':
       return `Difference (B - A): ${(toNumber(values.b) - toNumber(values.a)).toLocaleString('en-IN')}`;
+      return `Required monthly saving: ₹${pmt.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    }
+    case 'emergency-fund-calculator':
+      return `Recommended emergency fund: ₹${(toNumber(values.expense) * toNumber(values.months)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    case 'loan-comparison-tool':
+      return `Loan A total: ₹${(toNumber(values.emiA) * toNumber(values.months)).toLocaleString('en-IN')} vs Loan B total: ₹${(toNumber(values.emiB) * toNumber(values.months)).toLocaleString('en-IN')}`;
+    case 'investment-comparison-tool':
+      return `Difference (B - A): ₹${(toNumber(values.b) - toNumber(values.a)).toLocaleString('en-IN')}`;
     case 'age-calculator':
       return `Approximate age in 2026: ${Math.max(0, 2026 - toNumber(values.birthYear))} years`;
     case 'percentage-calculator':
       return `${toNumber(values.part)} is ${((toNumber(values.part) / toNumber(values.whole)) * 100).toFixed(2)}% of ${toNumber(values.whole)}`;
     case 'discount-calculator':
       return `Final price after discount: ${(toNumber(values.price) * (1 - toNumber(values.discount) / 100)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+      return `Final price after discount: ₹${(toNumber(values.price) * (1 - toNumber(values.discount) / 100)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
     case 'time-calculator':
       return `${toNumber(values.hours)} hours = ${toNumber(values.hours) * 60} minutes = ${toNumber(values.hours) * 3600} seconds`;
     case 'unit-converter':
@@ -145,6 +200,7 @@ function calculate(slug: string, values: Record<string, string | number>) {
     }
     case 'debt-consolidation-calculator':
       return `Estimated savings over tenure: ${((toNumber(values.currentEmi) - toNumber(values.newEmi)) * toNumber(values.months)).toLocaleString('en-IN')}`;
+      return `Estimated savings over tenure: ₹${((toNumber(values.currentEmi) - toNumber(values.newEmi)) * toNumber(values.months)).toLocaleString('en-IN')}`;
     case 'qr-code-generator':
       return `QR generator ready for text: ${String(values.text || '').slice(0, 80)}`;
     default:
@@ -239,6 +295,12 @@ export default function GenericToolPage() {
                   onChange={(e) => setValues((prev) => ({
                     ...prev,
                     [field.key]: field.type === 'text' ? e.target.value : e.target.value,
+                  type={field.type === 'text' ? 'text' : 'number'}
+                  className="w-full mt-1 rounded-md border px-3 py-2"
+                  value={values[field.key] ?? ''}
+                  onChange={(e) => setValues((prev) => ({
+                    ...prev,
+                    [field.key]: field.type === 'text' ? e.target.value : Number(e.target.value),
                   }))}
                 />
               </label>

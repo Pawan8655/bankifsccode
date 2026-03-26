@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import Video from "@/assets/contactus.mp4"
+import { SEO } from '@/components/SEO';
 
 export default function Contact() {
   const { toast } = useToast();
@@ -91,6 +92,11 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Contact bankifsccode.biz | IFSC Code Support"
+        description="Contact bankifsccode.biz for feedback, correction requests and support related to IFSC code search, branch data and financial tools."
+        path="/contact"
+      />
       <Header />
 
       <main className="flex-1">

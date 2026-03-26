@@ -1,10 +1,16 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { SEO } from '@/components/SEO';
 
 export default function Privacy() {
     return (
         <div className="min-h-screen flex flex-col bg-background">
+            <SEO
+                title="Privacy Policy | bankifsccode.biz"
+                description="Read the privacy policy for bankifsccode.biz, including data collection, cookie usage and website analytics practices."
+                path="/privacy"
+            />
             <Header />
             <main className="flex-1">
                 <div className="container mx-auto px-4 py-8">

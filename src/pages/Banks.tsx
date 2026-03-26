@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { useIFSCData } from '@/hooks/useIFSCData';
 import { getUniqueBanks, getStatesForBank } from '@/lib/csvParser';
 import { Loader } from '@/components/Loader';
+import { SEO } from '@/components/SEO';
 
 export default function Banks() {
   const { data, indices, loading, error } = useIFSCData();
@@ -54,6 +55,12 @@ export default function Banks() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="All Banks IFSC Code List in India | bankifsccode.biz"
+        description="Browse all banks in India and find IFSC codes by bank, state and city. Fast bank IFSC search with verified branch information."
+        path="/banks"
+        keywords="all banks IFSC code list, bank IFSC code India, state wise IFSC code, city wise bank IFSC"
+      />
       <Header />
 
       <main className="flex-1">

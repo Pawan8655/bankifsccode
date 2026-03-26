@@ -8,6 +8,7 @@ import { getBranchByIFSC, getBranchesForBankStateCity } from '@/lib/csvParser';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SEO } from '@/components/SEO';
 
 import { useMemo } from 'react';
 
@@ -45,8 +46,26 @@ export default function BranchPage() {
     { label: branch.Branch },
   ] : [];
 
+  const seoTitle = branch
+    ? `${branch.Bank} ${branch.Branch}, ${branch.City} IFSC Code ${branch.IFSC} | bankifsccode.biz`
+    : `IFSC Code ${ifsc || ''} Branch Details | bankifsccode.biz`;
+
+  const seoDescription = branch
+    ? `Check ${branch.Bank} ${branch.Branch}, ${branch.City}, ${branch.State} IFSC code ${branch.IFSC}, MICR, address and branch details for safe NEFT, RTGS and IMPS transactions.`
+    : `Find branch details using IFSC code ${ifsc || ''}. Get bank, state, city and branch information in one place.`;
+
+  const seoKeywords = branch
+    ? `${branch.IFSC}, ${branch.Bank} IFSC code, ${branch.City} IFSC code, ${branch.State} bank IFSC code`
+    : `${ifsc || ''} IFSC code, IFSC code branch details, bank IFSC code search`;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        path={`/branch/${encodeURIComponent(ifsc || '')}`}
+        keywords={seoKeywords}
+      />
       <Header />
 
       <main className="flex-1">

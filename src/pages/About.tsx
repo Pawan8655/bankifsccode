@@ -5,6 +5,7 @@ import { Users, Target, Shield, Award, CheckCircle, Building2 } from 'lucide-rea
 import { Card, CardContent } from '@/components/ui/card';
 import logo from '@/assets/logo.png';
 import aboutbg from "@/assets/about.png"
+import { SEO } from '@/components/SEO';
 
 export default function About() {
   const features = [
@@ -39,6 +40,11 @@ export default function About() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="About bankifsccode.biz | IFSC Code Search Platform"
+        description="Learn about bankifsccode.biz, our mission, data quality standards, and commitment to accurate IFSC code lookup across India."
+        path="/about"
+      />
       <Header />
 
       <main className="flex-1">

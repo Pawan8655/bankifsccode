@@ -10,6 +10,7 @@ import { useIFSCData } from '@/hooks/useIFSCData';
 import { getBankStats, getStatesForBank, getCitiesForBankAndState } from '@/lib/csvParser';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Building2 } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 export default function BankDetails() {
   const { bankName, stateName, cityName } = useParams();
@@ -127,8 +128,43 @@ export default function BankDetails() {
     ...(city ? [{ label: city }] : []),
   ];
 
+  const seoPath = city
+    ? `/bank/${encodeURIComponent(bank)}/${encodeURIComponent(state || '')}/${encodeURIComponent(city)}`
+    : state
+      ? `/bank/${encodeURIComponent(bank)}/${encodeURIComponent(state)}`
+      : `/bank/${encodeURIComponent(bank)}`;
+
+  const seoTitle = city
+    ? `${bank} ${city} ${state} IFSC Codes & Branch List | bankifsccode.biz`
+    : state
+      ? `${bank} ${state} IFSC Codes & City-wise Branches | bankifsccode.biz`
+      : `${bank} IFSC Codes, States & Cities | bankifsccode.biz`;
+
+  const seoDescription = city
+    ? `Find all ${bank} branches in ${city}, ${state} with IFSC code, MICR, address, contact and timing details for secure NEFT, RTGS and IMPS transfers.`
+    : state
+      ? `Explore ${bank} IFSC codes in ${state}. Browse city-wise branches with accurate IFSC, MICR and branch address details.`
+      : `Search ${bank} IFSC code data across India. Browse state-wise and city-wise branches with branch details for online banking and fund transfers.`;
+
+  const seoKeywords = [
+    `${bank} IFSC code`,
+    state ? `${bank} ${state} IFSC code` : '',
+    city ? `${bank} ${city} IFSC code` : '',
+    city ? `${city} bank IFSC code` : '',
+    state ? `${state} bank IFSC code` : '',
+    'bank IFSC code search',
+  ]
+    .filter(Boolean)
+    .join(', ');
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        path={seoPath}
+        keywords={seoKeywords}
+      />
       <Header />
 
       <main className="flex-1">

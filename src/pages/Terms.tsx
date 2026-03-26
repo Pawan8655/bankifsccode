@@ -2,10 +2,16 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { SEO } from '@/components/SEO';
 
 export default function Terms() {
     return (
         <div className="min-h-screen flex flex-col bg-background">
+            <SEO
+                title="Terms and Conditions | bankifsccode.biz"
+                description="Read the terms and conditions for using bankifsccode.biz IFSC code search and related banking information services."
+                path="/terms"
+            />
             <Header />
             <main className="flex-1">
                 <div className="container mx-auto px-4 py-8">

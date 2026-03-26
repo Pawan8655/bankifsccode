@@ -3,6 +3,7 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import blogs from './blogsData';
+import { SEO } from '@/components/SEO';
 
 const BLOGS_PER_PAGE = 10;
 
@@ -32,6 +33,11 @@ export default function Blogs() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Banking & Finance Blogs India | bankifsccode.biz"
+        description="Read practical banking, IFSC code, loan, tax and finance blogs for India with beginner-friendly FAQs and actionable guidance."
+        path="/blogs"
+      />
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-8">

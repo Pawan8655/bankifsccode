@@ -1,6 +1,23 @@
-import { Search, Building2, TrendingUp, ArrowRight, GitBranch, Sparkles, Shield, Zap, Calculator, BookOpen } from 'lucide-react';
-import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  ArrowRight,
+  BadgeCheck,
+  BookOpen,
+  Building2,
+  Calculator,
+  Compass,
+  CreditCard,
+  GitBranch,
+  HeartPulse,
+  Landmark,
+  MapPin,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+  Wallet,
+} from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SearchFilters } from '@/components/SearchFilters';
@@ -9,439 +26,387 @@ import { Loader } from '@/components/Loader';
 import { FavoritesSection } from '@/components/FavoritesSection';
 import { SearchHistorySection } from '@/components/SearchHistorySection';
 import { useIFSCData } from '@/hooks/useIFSCData';
-import { getUniqueBanks, getOverallStats } from '@/lib/csvParser';
-import { Card, CardContent } from '@/components/ui/card';
+import { getOverallStats } from '@/lib/csvParser';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import logo from '@/assets/logo.png';
+import { Input } from '@/components/ui/input';
 import { SEO } from '@/components/SEO';
+import { cn } from '@/lib/utils';
 
-// Famous banks in India with priority order
-const FAMOUS_BANKS = [
-  'State Bank of India',
-  'HDFC Bank',
-  'ICICI Bank',
-  'Punjab National Bank',
-  'Bank of Baroda',
-  'Canara Bank',
-  'Union Bank of India',
-  'Axis Bank',
-  'Indian Overseas Bank',
-  'Kotak Mahindra Bank',
-  'IndusInd Bank',
-  'Yes Bank',
+type SearchSuggestion = {
+  label: string;
+  type: 'bank' | 'city' | 'tool' | 'product';
+  value: string;
+  href: string;
+};
+
+type CompareProduct = {
+  name: string;
+  annualFee?: string;
+  rewards?: string;
+  cashback?: string;
+  eligibility?: string;
+  brokerage?: string;
+  openingFee?: string;
+  amc?: string;
+  best?: boolean;
+};
+
+const QUICK_ACTIONS = [
+  { label: 'IFSC Code', href: '/banks' },
+  { label: 'Bank Branch', href: '/banks' },
+  { label: 'Credit Cards', href: '/credit-cards' },
+  { label: 'Loans', href: '/loans' },
+  { label: 'Insurance', href: '/insurance' },
+  { label: 'Demat Accounts', href: '/demat-accounts' },
 ];
 
-// Bank colors for visual interest
-const BANK_COLORS = [
-  'from-primary/20 to-primary/5 border-primary/30',
-  'from-secondary/20 to-secondary/5 border-secondary/30',
-  'from-accent/20 to-accent/5 border-accent/30',
-  'from-primary/15 to-accent/10 border-primary/20',
-  'from-secondary/15 to-primary/10 border-secondary/20',
-  'from-accent/15 to-secondary/10 border-accent/20',
+const QUICK_TOOLS = [
+  { title: 'IFSC Code Finder', desc: 'Instant branch-level IFSC lookup', icon: Search, href: '/banks' },
+  { title: 'MICR Code Finder', desc: 'Locate MICR details quickly', icon: Landmark, href: '/micr-code-finder' },
+  { title: 'Bank Branch Locator', desc: 'Find branches by city & state', icon: MapPin, href: '/banks' },
+  { title: 'EMI Calculator', desc: 'Calculate monthly loan repayment', icon: Calculator, href: '/emi-calculator' },
+  { title: 'FD Calculator', desc: 'Estimate fixed deposit maturity', icon: Wallet, href: '/fd-calculator' },
+  { title: 'SIP Calculator', desc: 'Project long-term wealth growth', icon: TrendingUp, href: '/sip-calculator' },
+];
+
+const CREDIT_CARDS: CompareProduct[] = [
+  { name: 'HDFC Regalia Gold', annualFee: '₹2,500', rewards: '4 pts/₹150', cashback: 'Up to 10%', eligibility: '₹12L+ income', best: true },
+  { name: 'SBI Cashback Card', annualFee: '₹999', rewards: '5% online', cashback: 'Up to ₹5,000/mo', eligibility: '₹6L+ income' },
+  { name: 'ICICI Amazon Pay', annualFee: 'Lifetime Free', rewards: 'Prime cashback', cashback: '5% on Amazon', eligibility: 'Good credit score' },
+  { name: 'Axis ACE', annualFee: '₹499', rewards: 'Utility rewards', cashback: '5% bills', eligibility: '₹4.5L+ income' },
+];
+
+const DEMAT_ACCOUNTS: CompareProduct[] = [
+  { name: 'Zerodha', brokerage: '₹20/order', openingFee: '₹200', amc: '₹300/yr', best: true },
+  { name: 'Upstox', brokerage: '₹20/order', openingFee: '₹0', amc: '₹150-₹300/yr' },
+  { name: 'Angel One', brokerage: '₹20/order', openingFee: '₹0', amc: '₹240/yr' },
+];
+
+const LOANS = [
+  { title: 'Personal Loan', rate: '10.50% - 24%', tenure: '1 to 7 years', emi: '₹2,150 per ₹1L (5 yrs)' },
+  { title: 'Home Loan', rate: '8.35% - 10.75%', tenure: '5 to 30 years', emi: '₹775 per ₹1L (20 yrs)' },
+  { title: 'Car Loan', rate: '8.80% - 13%', tenure: '1 to 7 years', emi: '₹2,030 per ₹1L (5 yrs)' },
+];
+
+const INSURANCE = [
+  { title: 'Life Insurance', benefit: 'Financial security for family', premium: 'Starts ~₹500/mo' },
+  { title: 'Health Insurance', benefit: 'Cashless hospitalization', premium: 'Starts ~₹700/mo' },
+  { title: 'Motor Insurance', benefit: 'Own damage + third-party cover', premium: 'Starts ~₹2,000/yr' },
+];
+
+const SEO_GUIDES = [
+  'Best Credit Cards in India',
+  'How to Find IFSC Code',
+  'Top Demat Accounts',
 ];
 
 export default function Index() {
+  const navigate = useNavigate();
   const { data, indices, loading, error } = useIFSCData();
+  const [globalSearch, setGlobalSearch] = useState('');
+  const [locationHint, setLocationHint] = useState('Enable location to find nearest branches.');
 
-  const banks = useMemo(() => {
-    return indices ? indices.banks : getUniqueBanks(data);
-  }, [data, indices]);
+  const stats = useMemo(() => getOverallStats(data), [data]);
 
-  const stats = useMemo(() => {
-    return getOverallStats(data);
-  }, [data]);
+  const globalSuggestions = useMemo<SearchSuggestion[]>(() => {
+    const q = globalSearch.trim().toLowerCase();
+    if (q.length < 2) return [];
 
-  // Get famous banks that exist in data, maintaining priority order
-  const popularBanks = useMemo(() => {
-    if (!indices) return [];
+    const bankSuggestions = (indices?.banks || [])
+      .filter((bank) => bank.toLowerCase().includes(q))
+      .slice(0, 4)
+      .map((bank) => ({ label: bank, type: 'bank' as const, value: bank, href: `/bank/${encodeURIComponent(bank)}` }));
 
-    return FAMOUS_BANKS
-      .filter(bank => indices.banks.includes(bank))
-      .slice(0, 12)
-      .map((bank, index) => {
-        // Calculate counts using indices if possible or fallback to data scan (expensive but done once here)
-        // Since we have indices, let's use the maps to be faster
-        const statesSet = indices.statesMap.get(bank);
-        const stateCount = statesSet ? statesSet.size : 0;
+    const citySuggestions = Array.from(new Set(data.map((d) => d.City)))
+      .filter((city) => city.toLowerCase().includes(q))
+      .slice(0, 3)
+      .map((city) => ({ label: `${city} branches`, type: 'city' as const, value: city, href: '/banks' }));
 
-        let branchCount = 0;
-        if (indices.branchesMap.has(bank)) {
-          // This traversal is faster than filtering 160k rows
-          const bankStates = indices.branchesMap.get(bank)!;
-          for (const cityMap of bankStates.values()) {
-            for (const branchList of cityMap.values()) {
-              branchCount += branchList.length;
-            }
-          }
-        }
+    const productSuggestions: SearchSuggestion[] = [
+      { label: 'Credit Cards', type: 'product', value: 'credit cards', href: '/credit-cards' },
+      { label: 'Loans', type: 'product', value: 'loans', href: '/loans' },
+      { label: 'Insurance', type: 'product', value: 'insurance', href: '/insurance' },
+      { label: 'Demat Accounts', type: 'product', value: 'demat', href: '/demat-accounts' },
+      { label: 'EMI Calculator', type: 'tool', value: 'emi calculator', href: '/emi-calculator' },
+      { label: 'SIP Calculator', type: 'tool', value: 'sip calculator', href: '/sip-calculator' },
+    ].filter((item) => item.value.includes(q));
 
-        return {
-          name: bank,
-          branchCount,
-          stateCount,
-          colorClass: BANK_COLORS[index % BANK_COLORS.length],
-        };
-      });
-  }, [indices]);
+    return [...bankSuggestions, ...citySuggestions, ...productSuggestions].slice(0, 8);
+  }, [globalSearch, indices, data]);
 
-  // Get all banks for the "All Banks" section
-  // Memoize this heavy sort/map operation
-  const allBanksData = useMemo(() => {
-    if (!indices) return [];
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationHint('Location unavailable on this browser. Use city/state filters below.');
+      return;
+    }
 
-    return indices.banks.map((bank, index) => {
-      let branchCount = 0;
-      if (indices.branchesMap.has(bank)) {
-        const bankStates = indices.branchesMap.get(bank)!;
-        for (const cityMap of bankStates.values()) {
-          for (const branchList of cityMap.values()) {
-            branchCount += branchList.length;
-          }
-        }
-      }
+    navigator.geolocation.getCurrentPosition(
+      () => setLocationHint('Location detected. Showing India-focused nearby branch discovery by city/state.'),
+      () => setLocationHint('Unable to detect location. Please select city and state manually.')
+    );
+  };
 
-      return {
-        name: bank,
-        branchCount,
-        colorClass: BANK_COLORS[index % BANK_COLORS.length],
-      };
-    }).sort((a, b) => b.branchCount - a.branchCount).slice(0, 24);
-  }, [indices]);
-
+  const compareRows = [
+    { label: 'Annual Fee', key: 'annualFee' as const },
+    { label: 'Rewards', key: 'rewards' as const },
+    { label: 'Cashback', key: 'cashback' as const },
+    { label: 'Eligibility', key: 'eligibility' as const },
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <SEO
-        title="Bank IFSC Code Search & Financial Calculators India | bankifsccode.biz"
-        description="Search any bank IFSC code instantly and use bankifsccode.biz tools like EMI and SIP calculators. Explore financial calculators India users trust."
+        title="bankifsccode.biz - IFSC Finder, Comparisons, Loans, Credit Cards"
+        description="Premium Indian financial discovery platform: IFSC lookup, branch locator, smart comparison tools, calculators, and product discovery."
         path="/"
       />
       <Header />
 
-      <main className="flex-1">
-        {/* Hero Section with Enhanced Gradient */}
-        <section className="relative pt-4 pb-12 sm:pt-10 sm:pb-20 overflow-hidden flex flex-col">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-
-          {/* Animated background elements */}
-          <div className="absolute top-10 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="container mx-auto px-4 relative">
-            <div className="text-center max-w-5xl mx-auto mb-8 sm:mb-12">
-              <div className="mt-3 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-background/50 backdrop-blur-sm border-2 border-primary/20 shadow-lg mb-8 animate-fade-in hover:border-primary/50 transition-all duration-300 group">
-                <Sparkles className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                <span className="font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  India's Most Trusted IFSC Database
-                </span>
-                <Badge variant="secondary" className="ml-2 bg-primary/10 text-primary border-primary/20">
-                  FREE
-                </Badge>
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-foreground mb-6 animate-slide-up leading-tight tracking-tight">
-                Find Bank <span className="gradient-text">IFSC Codes</span>
-              </h1>
-              {loading ? (
-                <div className="py-8">
-                  <Loader text="Loading Bank Details " />
-                </div>
-              ) : error ? (
-                <div className="text-center text-destructive py-4">{error}</div>
-              ) : (
-                <div className="animate-slide-up w-full max-w-2xl mx-auto border-2 border-primary/20 rounded-2xl shadow-lg bg-card/30 backdrop-blur-sm" style={{ animationDelay: '0.3s' }}>
-                  <SearchFilters data={data} indices={indices} />
-                </div>
-              )}
-
-              <p className="text-lg sm:text-2xl text-black animate-fade-in max-w-3xl mx-auto font-light mt-8" style={{ animationDelay: '0.2s' }}>
-                Search through {loading ? '...' : stats.totalBranches.toLocaleString()}+ bank branches across{' '}
-                {loading ? '...' : '28'} states and 8 UTs. <span className="font-medium text-foreground">Quick, accurate, and 100% free.</span>
+      <main>
+        <section className="relative overflow-hidden border-b bg-gradient-to-br from-[#0B3C5D] via-[#1e3a8a] to-[#0f172a] text-white">
+          <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_30%_20%,#67e8f9,transparent_35%),radial-gradient(circle_at_80%_0%,#facc15,transparent_30%)]" />
+          <div className="container relative mx-auto px-4 pb-10 pt-6 sm:pb-16 sm:pt-10">
+            <div className="mx-auto max-w-5xl text-center">
+              <Badge className="mb-4 border-0 bg-white/15 text-white hover:bg-white/20">
+                <Sparkles className="mr-2 h-4 w-4" /> Trusted by 1M+ users across India
+              </Badge>
+              <h1 className="text-3xl font-bold leading-tight sm:text-5xl">Search. Compare. Choose better financial products.</h1>
+              <p className="mx-auto mt-4 max-w-2xl text-sm text-slate-100 sm:text-lg">
+                IFSC codes, branch details, credit cards, loans, insurance and demat comparison — fast, clean and mobile-first.
               </p>
 
-              {/* Quick feature badges */}
-              <div className="flex flex-wrap justify-center gap-4 mt-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <Badge variant="outline" className="px-4 py-2 gap-2 border-primary/30 bg-primary/5">
-                  <Shield className="h-4 w-4 text-primary" />
-                  RBI Verified
-                </Badge>
-                <Badge variant="outline" className="px-4 py-2 gap-2 border-accent/30 bg-accent/5">
-                  <Zap className="h-4 w-4 text-accent" />
-                  Instant Search
-                </Badge>
-                <Badge variant="outline" className="px-4 py-2 gap-2 border-secondary/30 bg-secondary/5">
-                  <TrendingUp className="h-4 w-4 text-secondary" />
-                  Always Updated
-                </Badge>
+              <div className="mx-auto mt-7 max-w-3xl rounded-2xl border border-white/20 bg-white/10 p-3 backdrop-blur">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-slate-300" />
+                  <Input
+                    value={globalSearch}
+                    onChange={(e) => setGlobalSearch(e.target.value)}
+                    placeholder="Search IFSC Code, Bank, Branch, Credit Cards, Loans..."
+                    className="h-12 border-white/30 bg-white/95 pl-12 text-slate-900"
+                  />
+                  {globalSuggestions.length > 0 && (
+                    <div className="absolute z-40 mt-2 w-full overflow-hidden rounded-xl border bg-white text-left text-slate-900 shadow-xl">
+                      {globalSuggestions.map((item) => (
+                        <button
+                          key={`${item.type}-${item.label}`}
+                          className="flex w-full items-center justify-between border-b px-4 py-3 text-sm last:border-0 hover:bg-slate-50"
+                          onClick={() => navigate(item.href)}
+                        >
+                          <span>{item.label}</span>
+                          <Badge variant="outline" className="capitalize">{item.type}</Badge>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {QUICK_ACTIONS.map((item) => (
+                    <Link key={item.label} to={item.href}>
+                      <Button size="sm" variant="secondary" className="rounded-full bg-white/90 text-slate-900 hover:bg-white">
+                        {item.label}
+                      </Button>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-
         </section>
 
-        {/* Favorites Section */}
-        <FavoritesSection />
+        <section className="container mx-auto px-4 py-8 sm:py-10">
+          {loading ? <Loader text="Loading live bank data..." /> : <StatsCards stats={stats} variant="gradient" />}
+        </section>
 
-        {/* Search History Section */}
+        <section className="container mx-auto px-4 pb-8">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {QUICK_TOOLS.map((tool) => (
+              <Link key={tool.title} to={tool.href} className="group rounded-2xl border bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+                <tool.icon className="mb-3 h-5 w-5 text-[#0B3C5D]" />
+                <h3 className="font-semibold group-hover:text-[#0B3C5D]">{tool.title}</h3>
+                <p className="mt-1 text-sm text-slate-600">{tool.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-8">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <Card className="border-0 bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl"><CreditCard className="h-5 w-5 text-[#0B3C5D]" /> Credit Cards</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {CREDIT_CARDS.map((card) => (
+                  <div key={card.name} className="rounded-xl border p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-medium">{card.name}</p>
+                      {card.best && <Badge className="bg-emerald-100 text-emerald-700">Best Value</Badge>}
+                    </div>
+                    <p className="mt-2 text-sm text-slate-600">Fee: {card.annualFee} • Rewards: {card.rewards} • Cashback: {card.cashback}</p>
+                  </div>
+                ))}
+                <Button className="w-full bg-[#0B3C5D] hover:bg-[#0B3C5D]/90">Compare Now</Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl"><TrendingUp className="h-5 w-5 text-teal-700" /> Demat Accounts</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {DEMAT_ACCOUNTS.map((account) => (
+                  <div key={account.name} className={cn('rounded-xl border p-3', account.best && 'border-emerald-300 bg-emerald-50/60')}>
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium">{account.name}</p>
+                      {account.best && <BadgeCheck className="h-4 w-4 text-emerald-600" />}
+                    </div>
+                    <p className="mt-2 text-sm text-slate-600">Brokerage: {account.brokerage} • Opening: {account.openingFee} • AMC: {account.amc}</p>
+                  </div>
+                ))}
+                <Button variant="outline" className="w-full">Check Details</Button>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-8">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <Card className="border-0 bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl"><Landmark className="h-5 w-5 text-[#0B3C5D]" /> Loans</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {LOANS.map((loan) => (
+                  <div key={loan.title} className="rounded-xl border p-3">
+                    <p className="font-medium">{loan.title}</p>
+                    <p className="mt-2 text-sm text-slate-600">Interest: {loan.rate} • Tenure: {loan.tenure} • EMI: {loan.emi}</p>
+                  </div>
+                ))}
+                <Button className="w-full bg-teal-700 hover:bg-teal-700/90">Apply Now</Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl"><HeartPulse className="h-5 w-5 text-rose-600" /> Insurance</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {INSURANCE.map((item) => (
+                  <div key={item.title} className="rounded-xl border p-3">
+                    <p className="font-medium">{item.title}</p>
+                    <p className="mt-2 text-sm text-slate-600">{item.benefit}</p>
+                    <p className="text-sm font-medium text-slate-700">Premium: {item.premium}</p>
+                  </div>
+                ))}
+                <Button variant="outline" className="w-full">Compare Plans</Button>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-8">
+          <Card className="overflow-hidden border-0 bg-white shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-xl"><GitBranch className="h-5 w-5 text-[#0B3C5D]" /> Side-by-side credit card comparison</CardTitle>
+            </CardHeader>
+            <CardContent className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-sm">
+                <thead>
+                  <tr className="border-b bg-slate-50 text-left">
+                    <th className="px-3 py-3 font-semibold">Feature</th>
+                    {CREDIT_CARDS.map((card) => (
+                      <th key={card.name} className={cn('px-3 py-3 font-semibold', card.best && 'bg-emerald-50')}>
+                        {card.name} {card.best && <Badge className="ml-2 bg-emerald-100 text-emerald-700">Best</Badge>}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {compareRows.map((row) => (
+                    <tr key={row.key} className="border-b align-top">
+                      <td className="px-3 py-3 font-medium">{row.label}</td>
+                      {CREDIT_CARDS.map((card) => (
+                        <td key={`${card.name}-${row.key}`} className={cn('px-3 py-3 text-slate-700', card.best && 'bg-emerald-50/50')}>
+                          {card[row.key]}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="container mx-auto px-4 pb-8">
+          <Card className="border-0 bg-gradient-to-r from-[#0B3C5D] to-[#1e3a8a] text-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <h2 className="flex items-center gap-2 text-xl font-semibold"><Compass className="h-5 w-5" /> Location-based branch discovery</h2>
+                <Button variant="secondary" onClick={detectLocation}>Use My Location</Button>
+              </div>
+              <p className="text-sm text-slate-100">{locationHint}</p>
+              <div className="mt-5 rounded-2xl border border-white/20 bg-white/95 p-4 text-slate-900">
+                {loading ? (
+                  <Loader text="Preparing branch filters..." />
+                ) : error ? (
+                  <p className="text-sm text-rose-600">{error}</p>
+                ) : (
+                  <SearchFilters data={data} indices={indices} />
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <FavoritesSection />
         <SearchHistorySection />
 
-        {/* Stats Section with Enhanced Styling */}
-        <section className="py-12 sm:py-16 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-muted/50 via-primary/5 to-muted/50" />
-          <div className="container mx-auto px-4 relative">
-            {loading ? (
-              <Loader text="Loading statistics..." />
-            ) : (
-              <StatsCards stats={stats} variant="gradient" />
-            )}
-          </div>
-        </section>
-
-        {/* Popular Banks Section */}
-        <section className="py-12 sm:py-16">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
-                  <span className="p-2 rounded-xl bg-gradient-to-br from-primary to-secondary text-primary-foreground">
-                    <TrendingUp className="h-5 w-5" />
-                  </span>
-                  Popular Banks
-                </h2>
-                <p className="text-black">
-                  Browse IFSC codes from top Indian banks
-                </p>
-              </div>
-              <Link to="/banks">
-                <Button variant="outline" className="hidden sm:flex items-center gap-2 border-primary/30 hover:bg-primary/10 hover:text-primary">
-                  View all banks
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+        <section className="container mx-auto px-4 py-10">
+          <div className="grid gap-4 md:grid-cols-3">
+            {SEO_GUIDES.map((guide) => (
+              <Link key={guide} to="/blogs" className="rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md">
+                <BookOpen className="mb-3 h-5 w-5 text-[#0B3C5D]" />
+                <h3 className="font-semibold">{guide}</h3>
+                <p className="mt-2 text-sm text-slate-600">Practical, India-focused guides for better financial decisions.</p>
+                <span className="mt-4 inline-flex items-center text-sm font-medium text-[#0B3C5D]">Read Guide <ArrowRight className="ml-1 h-4 w-4" /></span>
               </Link>
-            </div>
-
-            {loading ? (
-              <Loader text="Loading banks..." size="lg" />
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {popularBanks.map((bank, index) => (
-                  <Link
-                    key={bank.name}
-                    to={`/bank/${encodeURIComponent(bank.name)}`}
-                    className="block animate-fade-in"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <Card className={`h-full border-2 bg-gradient-to-br ${bank.colorClass} hover:shadow-xl transition-all duration-300 hover:scale-[1.03] group overflow-hidden relative`}>
-                      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-full" />
-                      <CardContent className="p-5">
-                        <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors mb-3 line-clamp-1 text-lg">
-                          {bank.name}
-                        </h3>
-                        <div className="flex items-center gap-4 text-sm text-black">
-                          <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-background/50">
-                            <GitBranch className="h-3.5 w-3.5 text-primary" />
-                            {bank.branchCount.toLocaleString()} branches
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-6 sm:hidden">
-              <Link to="/banks">
-                <Button variant="outline" className="w-full border-primary/30">
-                  View all banks
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
+            ))}
           </div>
         </section>
 
-        {/* All Banks Section */}
-        <section className="py-12 sm:py-16 bg-gradient-to-br from-muted/50 via-background to-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
-                <span className="p-2 rounded-xl bg-gradient-to-br from-secondary to-accent text-secondary-foreground">
-                  <Building2 className="h-5 w-5" />
-                </span>
-                All Banks ({loading ? '...' : banks.length})
-              </h2>
-              <p className="text-black">
-                Complete list of banks with IFSC codes
-              </p>
-            </div>
-
-            {loading ? (
-              <Loader text="Loading all banks..." size="lg" />
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allBanksData.slice(0, 12).map((bank, index) => (
-                  <Link
-                    key={bank.name}
-                    to={`/bank/${encodeURIComponent(bank.name)}`}
-                    className="block animate-fade-in"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <Card className={`h-full border bg-gradient-to-r ${bank.colorClass} hover:shadow-lg transition-all duration-300 group`}>
-                      <CardContent className="p-5">
-                        <h3 className="font-medium text-foreground group-hover:text-primary transition-colors mb-1 line-clamp-2">
-                          {bank.name}
-                        </h3>
-                        <p className="text-sm text-black flex items-center gap-1">
-                          <GitBranch className="h-3 w-3" />
-                          {bank.branchCount.toLocaleString()} branches
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            {!loading && banks.length > allBanksData.length && (
-              <div className="mt-8 text-center">
-                <Link to="/banks">
-                  <Button size="lg" className="gap-2 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg">
-                    View All {banks.length} Banks
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Info Section */}
-        <section className="py-16 sm:py-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
-          <div className="container mx-auto px-4 relative">
-            <div className="max-w-3xl mx-auto text-center">
-              <div className="inline-flex p-2 border-2 border-primary/20 rounded-full mb-6 animate-pulse-glow">
-                <img src={logo} alt="IFSC Code" className=" rounded-full h-16 w-16 text-primary" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 animate-fade-in">
-                What is an <span className="gradient-text">IFSC Code</span>?
-              </h1>
-              <p className="text-lg text-black leading-relaxed animate-fade-in">
-                IFSC (Indian Financial System Code) is an 11-character alphanumeric code used for
-                electronic fund transfers in India. The first 4 characters represent the bank,
-                the 5th is always 0 (reserved for future use), and the last 6 characters identify
-                the specific branch. This code is essential for NEFT, RTGS, and IMPS transactions.
-              </p>
-
-              <div className="grid sm:grid-cols-3 gap-4 mt-10">
-                {[
-                  { title: 'First 4 Chars', desc: 'Bank Code', example: 'SBIN' },
-                  { title: '5th Character', desc: 'Reserved (Always 0)', example: '0' },
-                  { title: 'Last 6 Chars', desc: 'Branch Code', example: '000001' },
-                ].map((item, index) => (
-                  <Card key={index} className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
-                    <CardContent className="p-4 text-center">
-                      <div className="font-mono text-2xl font-bold text-primary mb-2">{item.example}</div>
-                      <div className="font-medium text-foreground">{item.title}</div>
-                      <div className="text-sm text-black">{item.desc}</div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SEO Content Section */}
-        <section className="py-12 sm:py-16 bg-gradient-to-br from-muted/50 via-primary/5 to-muted/50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
-                <Search className="h-6 w-6 text-primary" />
-                Find IFSC Codes for All Indian Banks
-              </h2>
-              <div className="prose prose-sm text-black space-y-4">
-                <p>
-                  Welcome to IFSC Finder, your one-stop destination for finding IFSC codes of all banks in India.
-                  Whether you need the IFSC code for State Bank of India, HDFC Bank, ICICI Bank, or any other bank,
-                  our comprehensive database has you covered.
-                </p>
-                <p>
-                  <strong className="text-foreground">Why use IFSC Finder?</strong> We provide accurate, RBI-verified IFSC codes
-                  for over {stats.totalBranches.toLocaleString()} bank branches across {stats.totalStates} states and union territories.
-                  Our database includes all major banks like Punjab National Bank, Bank of Baroda, Canara Bank,
-                  Union Bank of India, Axis Bank, and more.
-                </p>
-                <p>
-                  Each IFSC code is essential for:
-                </p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>NEFT (National Electronic Funds Transfer) transactions</li>
-                  <li>RTGS (Real Time Gross Settlement) transfers</li>
-                  <li>IMPS (Immediate Payment Service) payments</li>
-                  <li>Online banking and mobile banking transfers</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-12 sm:py-16">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-6">Featured Tools</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <Link to="/emi-calculator" className="rounded-xl border p-5 hover:bg-primary/5 transition-colors">
-                <h3 className="font-semibold flex items-center gap-2"><Calculator className="h-4 w-4 text-primary" /> EMI Calculator</h3>
-                <p className="text-sm text-muted-foreground mt-2">Calculate monthly EMI, total interest, and repayment with chart-based insights.</p>
-              </Link>
-              <Link to="/sip-calculator" className="rounded-xl border p-5 hover:bg-primary/5 transition-colors">
-                <h3 className="font-semibold flex items-center gap-2"><TrendingUp className="h-4 w-4 text-green-600" /> SIP Calculator</h3>
-                <p className="text-sm text-muted-foreground mt-2">Estimate long-term wealth growth for monthly SIP investments in India.</p>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-12 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-6">Categories</h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                ['Bank IFSC Code Lookup', '/banks'],
-                ['Loan Calculators', '/emi-calculator'],
-                ['Investment Calculators', '/sip-calculator'],
-                ['Financial Education Blogs', '/blogs'],
-              ].map(([title, href]) => (
-                <Link key={title} to={href} className="rounded-xl border bg-background p-4 font-medium hover:border-primary/40">{title}</Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-12 sm:py-16">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2"><BookOpen className="h-5 w-5 text-primary" /> Latest Financial Articles</h2>
-            <div className="grid md:grid-cols-3 gap-4">
-              {[
-                ['How to verify a bank IFSC code before transfer', '/blogs'],
-                ['EMI vs tenure: how to reduce total interest paid', '/emi-calculator'],
-                ['SIP planning for long-term financial goals in India', '/sip-calculator'],
-              ].map(([title, href]) => (
-                <Link key={title} to={href} className="rounded-xl border p-5 hover:shadow-sm transition-shadow">
-                  <h3 className="font-semibold">{title}</h3>
-                  <p className="text-sm text-muted-foreground mt-2">Read practical guidance and apply with our free tools.</p>
-                </Link>
-              ))}
-            </div>
+        <section className="container mx-auto px-4 pb-24 md:pb-10">
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card className="border-0 bg-white shadow-sm"><CardContent className="p-5"><ShieldCheck className="mb-2 h-5 w-5 text-emerald-600" /><p className="font-semibold">Secure & trusted</p><p className="text-sm text-slate-600">Privacy-first platform trusted by Indian users.</p></CardContent></Card>
+            <Card className="border-0 bg-white shadow-sm"><CardContent className="p-5"><BadgeCheck className="mb-2 h-5 w-5 text-amber-600" /><p className="font-semibold">Transparent rankings</p><p className="text-sm text-slate-600">Sponsored listings marked clearly for trust.</p></CardContent></Card>
+            <Card className="border-0 bg-white shadow-sm"><CardContent className="p-5"><Building2 className="mb-2 h-5 w-5 text-[#0B3C5D]" /><p className="font-semibold">Made for India</p><p className="text-sm text-slate-600">Optimized for low bandwidth and mobile devices.</p></CardContent></Card>
           </div>
         </section>
       </main>
 
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-white/95 backdrop-blur md:hidden">
+        <nav className="mx-auto grid max-w-lg grid-cols-5 gap-1 px-2 py-2 text-xs">
+          {[
+            { label: 'Home', href: '/', icon: Search },
+            { label: 'Tools', href: '/tools', icon: Calculator },
+            { label: 'Compare', href: '/credit-cards', icon: GitBranch },
+            { label: 'Products', href: '/banks', icon: Landmark },
+            { label: 'Profile', href: '/about', icon: Wallet },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link key={item.label} to={item.href} className="flex flex-col items-center rounded-lg py-1 text-slate-600 hover:bg-slate-100 hover:text-[#0B3C5D]">
+                <Icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
       <Footer />
-    </div >
+    </div>
   );
 }

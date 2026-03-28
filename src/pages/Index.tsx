@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Building2,
@@ -8,8 +8,7 @@ import {
   MapPin,
   PiggyBank,
   Search,
-  ShieldCheck,
-  Sparkles,
+  Shield,
   TrendingUp,
 } from 'lucide-react';
 import { Header } from '@/components/Header';
@@ -254,6 +253,16 @@ export default function Index() {
                   )}
                 </div>
               </div>
+        <section className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-100/70">
+          <div className="container mx-auto px-4 py-10 sm:py-16">
+            <div className="mx-auto max-w-4xl text-center">
+              <Badge className="mb-4 border-0 bg-slate-900 text-white">Fast IFSC Finder for India</Badge>
+              <h1 className="text-3xl font-bold leading-tight sm:text-5xl">Instant IFSC search, built for speed.</h1>
+              <p className="mx-auto mt-4 max-w-2xl text-sm text-slate-600 sm:text-base">
+                Search IFSC codes, branch details, and city-wise bank information in one lightweight experience.
+              </p>
+
+              <div className="mx-auto mt-8 max-w-3xl">{renderSearchInput()}</div>
             </div>
           </div>
         </section>

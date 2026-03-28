@@ -55,8 +55,6 @@ export function Header() {
 
           <nav className="hidden items-center gap-1 lg:flex">
             {navLinks.map((link) => {
-              const hashTarget = link.to.includes('#') ? `#${link.to.split('#')[1]}` : '';
-              const isActive = link.to === '/' ? location.pathname === '/' && !location.hash : location.hash === hashTarget;
               const isActive = link.to === '/' ? location.pathname === '/' : location.hash === link.to.split('#')[1];
 
               return (

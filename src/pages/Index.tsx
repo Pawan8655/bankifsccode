@@ -1,410 +1,368 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowRight,
-  BadgeCheck,
-  BookOpen,
   Building2,
-  Calculator,
-  Compass,
   CreditCard,
-  GitBranch,
   HeartPulse,
   Landmark,
   MapPin,
+  PiggyBank,
   Search,
   ShieldCheck,
   Sparkles,
   TrendingUp,
-  Wallet,
 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { SearchFilters } from '@/components/SearchFilters';
-import { StatsCards } from '@/components/StatsCards';
-import { Loader } from '@/components/Loader';
-import { FavoritesSection } from '@/components/FavoritesSection';
-import { SearchHistorySection } from '@/components/SearchHistorySection';
-import { useIFSCData } from '@/hooks/useIFSCData';
-import { getOverallStats } from '@/lib/csvParser';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { SEO } from '@/components/SEO';
-import { cn } from '@/lib/utils';
 
-type SearchSuggestion = {
-  label: string;
-  type: 'bank' | 'city' | 'tool' | 'product';
-  value: string;
+type ToolItem = {
+  title: string;
+  description: string;
   href: string;
+  icon: typeof Search;
 };
 
-type CompareProduct = {
+type ProductItem = {
   name: string;
-  annualFee?: string;
-  rewards?: string;
-  cashback?: string;
-  eligibility?: string;
-  brokerage?: string;
-  openingFee?: string;
-  amc?: string;
-  best?: boolean;
+  provider: string;
+  description: string;
+  highlights: string[];
+  cta: string;
+  href: string;
+  icon: typeof CreditCard;
 };
 
-const QUICK_ACTIONS = [
-  { label: 'IFSC Code', href: '/banks' },
-  { label: 'Bank Branch', href: '/banks' },
-  { label: 'Credit Cards', href: '/credit-cards' },
-  { label: 'Loans', href: '/loans' },
-  { label: 'Insurance', href: '/insurance' },
-  { label: 'Demat Accounts', href: '/demat-accounts' },
+type Suggestion = { label: string; href: string; type: 'tool' | 'product' | 'bank' };
+
+const POPULAR_BANKS = [
+  'State Bank of India',
+  'HDFC Bank',
+  'ICICI Bank',
+  'Axis Bank',
+  'Punjab National Bank',
+  'Canara Bank',
 ];
 
-const QUICK_TOOLS = [
-  { title: 'IFSC Code Finder', desc: 'Instant branch-level IFSC lookup', icon: Search, href: '/banks' },
-  { title: 'MICR Code Finder', desc: 'Locate MICR details quickly', icon: Landmark, href: '/micr-code-finder' },
-  { title: 'Bank Branch Locator', desc: 'Find branches by city & state', icon: MapPin, href: '/banks' },
-  { title: 'EMI Calculator', desc: 'Calculate monthly loan repayment', icon: Calculator, href: '/emi-calculator' },
-  { title: 'FD Calculator', desc: 'Estimate fixed deposit maturity', icon: Wallet, href: '/fd-calculator' },
-  { title: 'SIP Calculator', desc: 'Project long-term wealth growth', icon: TrendingUp, href: '/sip-calculator' },
+const TOOL_CATEGORIES: { category: string; tools: ToolItem[] }[] = [
+  {
+    category: 'Personal Finance Tools',
+    tools: [
+      { title: 'Credit Card Eligibility Tool', description: 'Check card eligibility before applying.', href: '/credit-card-eligibility-tool', icon: CreditCard },
+      { title: 'Personal Loan Eligibility Tool', description: 'Estimate loan approval chances instantly.', href: '/personal-loan-eligibility-tool', icon: Building2 },
+      { title: 'Health Insurance Premium Tool', description: 'Estimate premium by age and coverage.', href: '/health-insurance-premium-tool', icon: HeartPulse },
+      { title: 'Demat Brokerage Tool', description: 'Compare brokerage by platform and trade type.', href: '/demat-brokerage-tool', icon: TrendingUp },
+      { title: 'Savings Account Finder', description: 'Find account options based on your needs.', href: '/savings-account-finder', icon: PiggyBank },
+      { title: 'FD Interest Compare Tool', description: 'Compare fixed deposit rates quickly.', href: '/fd-interest-compare-tool', icon: Landmark },
+    ],
+  },
+  {
+    category: 'Advanced Money Calculators',
+    tools: [
+      { title: 'EMI Calculator', description: 'Plan monthly loan payments.', href: '/emi-calculator', icon: TrendingUp },
+      { title: 'SIP Calculator', description: 'Estimate mutual fund growth.', href: '/sip-calculator', icon: TrendingUp },
+      { title: 'FD Calculator', description: 'Check FD maturity estimate.', href: '/fd-calculator', icon: PiggyBank },
+      { title: 'RD Calculator', description: 'Calculate RD maturity value.', href: '/rd-calculator', icon: PiggyBank },
+      { title: 'Retirement Corpus Calculator', description: 'Plan retirement target corpus.', href: '/retirement-corpus-calculator', icon: Building2 },
+      { title: 'Credit Card EMI Calculator', description: 'Convert card bill to EMI projection.', href: '/credit-card-emi-calculator', icon: CreditCard },
+    ],
+  },
 ];
 
-const CREDIT_CARDS: CompareProduct[] = [
-  { name: 'HDFC Regalia Gold', annualFee: '₹2,500', rewards: '4 pts/₹150', cashback: 'Up to 10%', eligibility: '₹12L+ income', best: true },
-  { name: 'SBI Cashback Card', annualFee: '₹999', rewards: '5% online', cashback: 'Up to ₹5,000/mo', eligibility: '₹6L+ income' },
-  { name: 'ICICI Amazon Pay', annualFee: 'Lifetime Free', rewards: 'Prime cashback', cashback: '5% on Amazon', eligibility: 'Good credit score' },
-  { name: 'Axis ACE', annualFee: '₹499', rewards: 'Utility rewards', cashback: '5% bills', eligibility: '₹4.5L+ income' },
+const PRODUCT_CATEGORIES: { category: string; products: ProductItem[] }[] = [
+  {
+    category: 'Credit Cards',
+    products: [
+      {
+        name: 'HDFC Millennia Credit Card',
+        provider: 'HDFC Bank',
+        description: 'Premium cashback card for online shopping and lifestyle spends.',
+        highlights: ['Cashback on online spends', 'Low annual fee', 'Welcome benefits'],
+        cta: 'Apply Now',
+        href: '/credit-cards/hdfc-millennia-credit-card',
+        icon: CreditCard,
+      },
+      {
+        name: 'SBI Cashback Credit Card',
+        provider: 'SBI Card',
+        description: 'Simple cashback card with strong digital purchase rewards.',
+        highlights: ['Flat cashback model', 'Online friendly rewards', 'Easy redemption'],
+        cta: 'Apply Now',
+        href: '/credit-cards/sbi-cashback-credit-card',
+        icon: CreditCard,
+      },
+    ],
+  },
+  {
+    category: 'Bank Accounts',
+    products: [
+      {
+        name: 'SBI Zero Balance Savings Account',
+        provider: 'State Bank of India',
+        description: 'Trusted savings account option with no minimum balance variant.',
+        highlights: ['No minimum balance', 'Wide branch network', 'Digital banking support'],
+        cta: 'Open Account',
+        href: '/bank-accounts/sbi-zero-balance-savings-account',
+        icon: PiggyBank,
+      },
+      {
+        name: 'Kotak 811 Account',
+        provider: 'Kotak Mahindra Bank',
+        description: 'Digital account opening with a premium app-led experience.',
+        highlights: ['Online onboarding', 'Zero-balance option', 'Modern mobile app'],
+        cta: 'Open Account',
+        href: '/bank-accounts/kotak-811-account',
+        icon: PiggyBank,
+      },
+    ],
+  },
+  {
+    category: 'Investments, Loans & Insurance',
+    products: [
+      {
+        name: 'Zerodha Account',
+        provider: 'Zerodha',
+        description: 'Demat + trading account with low-cost brokerage model.',
+        highlights: ['Low brokerage', 'Fast account opening', 'Strong trading tools'],
+        cta: 'Open Demat',
+        href: '/demat-accounts/zerodha-account',
+        icon: TrendingUp,
+      },
+      {
+        name: 'ICICI Personal Loan',
+        provider: 'ICICI Bank',
+        description: 'Personal loan product with quick approval journey.',
+        highlights: ['Fast approval flow', 'Flexible repayment', 'Online process'],
+        cta: 'Check Offer',
+        href: '/personal-loans/icici-personal-loan',
+        icon: Building2,
+      },
+      {
+        name: 'HDFC ERGO Health Insurance',
+        provider: 'HDFC ERGO',
+        description: 'Comprehensive health plans with large cashless hospital network.',
+        highlights: ['Cashless hospitals', 'Family options', 'Tax benefits eligibility'],
+        cta: 'View Plans',
+        href: '/health-insurance/hdfc-ergo-health-insurance',
+        icon: HeartPulse,
+      },
+    ],
+  },
 ];
 
-const DEMAT_ACCOUNTS: CompareProduct[] = [
-  { name: 'Zerodha', brokerage: '₹20/order', openingFee: '₹200', amc: '₹300/yr', best: true },
-  { name: 'Upstox', brokerage: '₹20/order', openingFee: '₹0', amc: '₹150-₹300/yr' },
-  { name: 'Angel One', brokerage: '₹20/order', openingFee: '₹0', amc: '₹240/yr' },
-];
-
-const LOANS = [
-  { title: 'Personal Loan', rate: '10.50% - 24%', tenure: '1 to 7 years', emi: '₹2,150 per ₹1L (5 yrs)' },
-  { title: 'Home Loan', rate: '8.35% - 10.75%', tenure: '5 to 30 years', emi: '₹775 per ₹1L (20 yrs)' },
-  { title: 'Car Loan', rate: '8.80% - 13%', tenure: '1 to 7 years', emi: '₹2,030 per ₹1L (5 yrs)' },
-];
-
-const INSURANCE = [
-  { title: 'Life Insurance', benefit: 'Financial security for family', premium: 'Starts ~₹500/mo' },
-  { title: 'Health Insurance', benefit: 'Cashless hospitalization', premium: 'Starts ~₹700/mo' },
-  { title: 'Motor Insurance', benefit: 'Own damage + third-party cover', premium: 'Starts ~₹2,000/yr' },
-];
-
-const SEO_GUIDES = [
-  'Best Credit Cards in India',
-  'How to Find IFSC Code',
-  'Top Demat Accounts',
-];
+const ALL_TOOLS = TOOL_CATEGORIES.flatMap((section) => section.tools);
+const ALL_PRODUCTS = PRODUCT_CATEGORIES.flatMap((section) => section.products);
 
 export default function Index() {
   const navigate = useNavigate();
-  const { data, indices, loading, error } = useIFSCData();
-  const [globalSearch, setGlobalSearch] = useState('');
-  const [locationHint, setLocationHint] = useState('Enable location to find nearest branches.');
+  const [query, setQuery] = useState('');
 
-  const stats = useMemo(() => getOverallStats(data), [data]);
-
-  const globalSuggestions = useMemo<SearchSuggestion[]>(() => {
-    const q = globalSearch.trim().toLowerCase();
+  const suggestions = useMemo<Suggestion[]>(() => {
+    const q = query.trim().toLowerCase();
     if (q.length < 2) return [];
 
-    const bankSuggestions = (indices?.banks || [])
-      .filter((bank) => bank.toLowerCase().includes(q))
+    const bankMatches = POPULAR_BANKS.filter((bank) => bank.toLowerCase().includes(q))
       .slice(0, 4)
-      .map((bank) => ({ label: bank, type: 'bank' as const, value: bank, href: `/bank/${encodeURIComponent(bank)}` }));
+      .map((bank) => ({ label: bank, href: `/bank/${encodeURIComponent(bank)}`, type: 'bank' as const }));
 
-    const citySuggestions = Array.from(new Set(data.map((d) => d.City)))
-      .filter((city) => city.toLowerCase().includes(q))
-      .slice(0, 3)
-      .map((city) => ({ label: `${city} branches`, type: 'city' as const, value: city, href: '/banks' }));
+    const toolMatches = ALL_TOOLS.filter((tool) => tool.title.toLowerCase().includes(q))
+      .slice(0, 5)
+      .map((tool) => ({ label: tool.title, href: tool.href, type: 'tool' as const }));
 
-    const productSuggestions: SearchSuggestion[] = [
-      { label: 'Credit Cards', type: 'product', value: 'credit cards', href: '/credit-cards' },
-      { label: 'Loans', type: 'product', value: 'loans', href: '/loans' },
-      { label: 'Insurance', type: 'product', value: 'insurance', href: '/insurance' },
-      { label: 'Demat Accounts', type: 'product', value: 'demat', href: '/demat-accounts' },
-      { label: 'EMI Calculator', type: 'tool', value: 'emi calculator', href: '/emi-calculator' },
-      { label: 'SIP Calculator', type: 'tool', value: 'sip calculator', href: '/sip-calculator' },
-    ].filter((item) => item.value.includes(q));
+    const productMatches = ALL_PRODUCTS.filter((product) => product.name.toLowerCase().includes(q))
+      .slice(0, 4)
+      .map((product) => ({ label: product.name, href: product.href, type: 'product' as const }));
 
-    return [...bankSuggestions, ...citySuggestions, ...productSuggestions].slice(0, 8);
-  }, [globalSearch, indices, data]);
-
-  const detectLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationHint('Location unavailable on this browser. Use city/state filters below.');
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      () => setLocationHint('Location detected. Showing India-focused nearby branch discovery by city/state.'),
-      () => setLocationHint('Unable to detect location. Please select city and state manually.')
-    );
-  };
-
-  const compareRows = [
-    { label: 'Annual Fee', key: 'annualFee' as const },
-    { label: 'Rewards', key: 'rewards' as const },
-    { label: 'Cashback', key: 'cashback' as const },
-    { label: 'Eligibility', key: 'eligibility' as const },
-  ];
+    return [...bankMatches, ...toolMatches, ...productMatches].slice(0, 10);
+  }, [query]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <SEO
-        title="bankifsccode.biz - IFSC Finder, Comparisons, Loans, Credit Cards"
-        description="Premium Indian financial discovery platform: IFSC lookup, branch locator, smart comparison tools, calculators, and product discovery."
+        title="bankifsccode.biz - Fast IFSC Finder, All Tools, Premium Financial Products"
+        description="Browse category-wise financial tools and premium product collections with a clean mobile-first design."
         path="/"
+        schema={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'WebSite',
+              name: 'bankifsccode.biz',
+              url: 'https://www.bankifsccode.biz/',
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: 'https://www.bankifsccode.biz/branch/{search_term_string}',
+                'query-input': 'required name=search_term_string',
+              },
+            },
+            {
+              '@type': 'ItemList',
+              name: 'IFSC Tools Categories',
+              itemListElement: TOOL_CATEGORIES.map((section, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                name: section.category,
+              })),
+            },
+          ],
+        }}
       />
+
       <Header />
 
       <main>
-        <section className="relative overflow-hidden border-b bg-gradient-to-br from-[#0B3C5D] via-[#1e3a8a] to-[#0f172a] text-white">
-          <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_30%_20%,#67e8f9,transparent_35%),radial-gradient(circle_at_80%_0%,#facc15,transparent_30%)]" />
-          <div className="container relative mx-auto px-4 pb-10 pt-6 sm:pb-16 sm:pt-10">
+        <section className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white">
+          <div className="container mx-auto px-4 py-10 sm:py-14">
             <div className="mx-auto max-w-5xl text-center">
-              <Badge className="mb-4 border-0 bg-white/15 text-white hover:bg-white/20">
-                <Sparkles className="mr-2 h-4 w-4" /> Trusted by 1M+ users across India
+              <Badge className="mb-4 border-0 bg-white/15 text-white">
+                <Sparkles className="mr-2 h-4 w-4" /> Premium IFSC Discovery Platform
               </Badge>
-              <h1 className="text-3xl font-bold leading-tight sm:text-5xl">Search. Compare. Choose better financial products.</h1>
-              <p className="mx-auto mt-4 max-w-2xl text-sm text-slate-100 sm:text-lg">
-                IFSC codes, branch details, credit cards, loans, insurance and demat comparison — fast, clean and mobile-first.
+              <h1 className="text-3xl font-bold sm:text-5xl">Find IFSC codes instantly. Explore every tool category.</h1>
+              <p className="mx-auto mt-4 max-w-3xl text-sm text-slate-200 sm:text-base">
+                Financial tools, calculators, and category-wise products in a premium, mobile-friendly layout.
               </p>
 
-              <div className="mx-auto mt-7 max-w-3xl rounded-2xl border border-white/20 bg-white/10 p-3 backdrop-blur">
+              <div className="mx-auto mt-8 max-w-3xl">
                 <div className="relative">
-                  <Search className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-slate-300" />
+                  <Search className="pointer-events-none absolute left-4 top-4 h-5 w-5 text-slate-400" />
                   <Input
-                    value={globalSearch}
-                    onChange={(e) => setGlobalSearch(e.target.value)}
-                    placeholder="Search IFSC Code, Bank, Branch, Credit Cards, Loans..."
-                    className="h-12 border-white/30 bg-white/95 pl-12 text-slate-900"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search IFSC Code, Bank Branch, City..."
+                    className="h-14 rounded-xl border-0 bg-white pl-12 text-base text-slate-900 shadow-lg"
                   />
-                  {globalSuggestions.length > 0 && (
-                    <div className="absolute z-40 mt-2 w-full overflow-hidden rounded-xl border bg-white text-left text-slate-900 shadow-xl">
-                      {globalSuggestions.map((item) => (
+
+                  {suggestions.length > 0 && (
+                    <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white text-left text-slate-900 shadow-xl">
+                      {suggestions.map((item) => (
                         <button
                           key={`${item.type}-${item.label}`}
-                          className="flex w-full items-center justify-between border-b px-4 py-3 text-sm last:border-0 hover:bg-slate-50"
                           onClick={() => navigate(item.href)}
+                          className="flex w-full items-center justify-between border-b border-slate-100 px-4 py-3 text-sm last:border-b-0 hover:bg-slate-50"
                         >
                           <span>{item.label}</span>
-                          <Badge variant="outline" className="capitalize">{item.type}</Badge>
+                          <Badge variant="outline" className="capitalize">
+                            {item.type}
+                          </Badge>
                         </button>
                       ))}
                     </div>
                   )}
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {QUICK_ACTIONS.map((item) => (
-                    <Link key={item.label} to={item.href}>
-                      <Button size="sm" variant="secondary" className="rounded-full bg-white/90 text-slate-900 hover:bg-white">
-                        {item.label}
-                      </Button>
-                    </Link>
-                  ))}
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="container mx-auto px-4 py-8 sm:py-10">
-          {loading ? <Loader text="Loading live bank data..." /> : <StatsCards stats={stats} variant="gradient" />}
-        </section>
-
-        <section className="container mx-auto px-4 pb-8">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {QUICK_TOOLS.map((tool) => (
-              <Link key={tool.title} to={tool.href} className="group rounded-2xl border bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
-                <tool.icon className="mb-3 h-5 w-5 text-[#0B3C5D]" />
-                <h3 className="font-semibold group-hover:text-[#0B3C5D]">{tool.title}</h3>
-                <p className="mt-1 text-sm text-slate-600">{tool.desc}</p>
-              </Link>
-            ))}
+        <section id="ifsc-tools" className="container mx-auto px-4 py-10">
+          <div className="mb-6 flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-slate-700" />
+            <h2 className="text-2xl font-semibold">All Financial Tool Categories</h2>
           </div>
-        </section>
 
-        <section className="container mx-auto px-4 pb-8">
-          <div className="grid gap-5 lg:grid-cols-2">
-            <Card className="border-0 bg-white shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl"><CreditCard className="h-5 w-5 text-[#0B3C5D]" /> Credit Cards</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {CREDIT_CARDS.map((card) => (
-                  <div key={card.name} className="rounded-xl border p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium">{card.name}</p>
-                      {card.best && <Badge className="bg-emerald-100 text-emerald-700">Best Value</Badge>}
-                    </div>
-                    <p className="mt-2 text-sm text-slate-600">Fee: {card.annualFee} • Rewards: {card.rewards} • Cashback: {card.cashback}</p>
+          <div className="space-y-6">
+            {TOOL_CATEGORIES.map((section) => (
+              <Card key={section.category} className="rounded-2xl border-slate-200 bg-white shadow-sm">
+                <CardContent className="p-6">
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <h3 className="text-lg font-semibold">{section.category}</h3>
+                    <Button asChild variant="outline" className="rounded-full">
+                      <Link to="/tools">View Category</Link>
+                    </Button>
                   </div>
-                ))}
-                <Button className="w-full bg-[#0B3C5D] hover:bg-[#0B3C5D]/90">Compare Now</Button>
-              </CardContent>
-            </Card>
 
-            <Card className="border-0 bg-white shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl"><TrendingUp className="h-5 w-5 text-teal-700" /> Demat Accounts</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {DEMAT_ACCOUNTS.map((account) => (
-                  <div key={account.name} className={cn('rounded-xl border p-3', account.best && 'border-emerald-300 bg-emerald-50/60')}>
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">{account.name}</p>
-                      {account.best && <BadgeCheck className="h-4 w-4 text-emerald-600" />}
-                    </div>
-                    <p className="mt-2 text-sm text-slate-600">Brokerage: {account.brokerage} • Opening: {account.openingFee} • AMC: {account.amc}</p>
-                  </div>
-                ))}
-                <Button variant="outline" className="w-full">Check Details</Button>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        <section className="container mx-auto px-4 pb-8">
-          <div className="grid gap-5 lg:grid-cols-2">
-            <Card className="border-0 bg-white shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl"><Landmark className="h-5 w-5 text-[#0B3C5D]" /> Loans</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {LOANS.map((loan) => (
-                  <div key={loan.title} className="rounded-xl border p-3">
-                    <p className="font-medium">{loan.title}</p>
-                    <p className="mt-2 text-sm text-slate-600">Interest: {loan.rate} • Tenure: {loan.tenure} • EMI: {loan.emi}</p>
-                  </div>
-                ))}
-                <Button className="w-full bg-teal-700 hover:bg-teal-700/90">Apply Now</Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 bg-white shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl"><HeartPulse className="h-5 w-5 text-rose-600" /> Insurance</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {INSURANCE.map((item) => (
-                  <div key={item.title} className="rounded-xl border p-3">
-                    <p className="font-medium">{item.title}</p>
-                    <p className="mt-2 text-sm text-slate-600">{item.benefit}</p>
-                    <p className="text-sm font-medium text-slate-700">Premium: {item.premium}</p>
-                  </div>
-                ))}
-                <Button variant="outline" className="w-full">Compare Plans</Button>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        <section className="container mx-auto px-4 pb-8">
-          <Card className="overflow-hidden border-0 bg-white shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl"><GitBranch className="h-5 w-5 text-[#0B3C5D]" /> Side-by-side credit card comparison</CardTitle>
-            </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-sm">
-                <thead>
-                  <tr className="border-b bg-slate-50 text-left">
-                    <th className="px-3 py-3 font-semibold">Feature</th>
-                    {CREDIT_CARDS.map((card) => (
-                      <th key={card.name} className={cn('px-3 py-3 font-semibold', card.best && 'bg-emerald-50')}>
-                        {card.name} {card.best && <Badge className="ml-2 bg-emerald-100 text-emerald-700">Best</Badge>}
-                      </th>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {section.tools.map((tool) => (
+                      <Card key={tool.href} className="rounded-xl border-slate-200 shadow-none">
+                        <CardContent className="p-4">
+                          <tool.icon className="mb-2 h-4 w-4 text-slate-700" />
+                          <p className="font-semibold">{tool.title}</p>
+                          <p className="mt-1 text-sm text-slate-600">{tool.description}</p>
+                          <Button asChild size="sm" className="mt-3 rounded-full bg-slate-900 hover:bg-slate-800">
+                            <Link to={tool.href}>Open Tool</Link>
+                          </Button>
+                        </CardContent>
+                      </Card>
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {compareRows.map((row) => (
-                    <tr key={row.key} className="border-b align-top">
-                      <td className="px-3 py-3 font-medium">{row.label}</td>
-                      {CREDIT_CARDS.map((card) => (
-                        <td key={`${card.name}-${row.key}`} className={cn('px-3 py-3 text-slate-700', card.best && 'bg-emerald-50/50')}>
-                          {card[row.key]}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
-        </section>
-
-        <section className="container mx-auto px-4 pb-8">
-          <Card className="border-0 bg-gradient-to-r from-[#0B3C5D] to-[#1e3a8a] text-white shadow-sm">
-            <CardContent className="p-6">
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <h2 className="flex items-center gap-2 text-xl font-semibold"><Compass className="h-5 w-5" /> Location-based branch discovery</h2>
-                <Button variant="secondary" onClick={detectLocation}>Use My Location</Button>
-              </div>
-              <p className="text-sm text-slate-100">{locationHint}</p>
-              <div className="mt-5 rounded-2xl border border-white/20 bg-white/95 p-4 text-slate-900">
-                {loading ? (
-                  <Loader text="Preparing branch filters..." />
-                ) : error ? (
-                  <p className="text-sm text-rose-600">{error}</p>
-                ) : (
-                  <SearchFilters data={data} indices={indices} />
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-
-        <FavoritesSection />
-        <SearchHistorySection />
-
-        <section className="container mx-auto px-4 py-10">
-          <div className="grid gap-4 md:grid-cols-3">
-            {SEO_GUIDES.map((guide) => (
-              <Link key={guide} to="/blogs" className="rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md">
-                <BookOpen className="mb-3 h-5 w-5 text-[#0B3C5D]" />
-                <h3 className="font-semibold">{guide}</h3>
-                <p className="mt-2 text-sm text-slate-600">Practical, India-focused guides for better financial decisions.</p>
-                <span className="mt-4 inline-flex items-center text-sm font-medium text-[#0B3C5D]">Read Guide <ArrowRight className="ml-1 h-4 w-4" /></span>
-              </Link>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </section>
 
-        <section className="container mx-auto px-4 pb-24 md:pb-10">
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card className="border-0 bg-white shadow-sm"><CardContent className="p-5"><ShieldCheck className="mb-2 h-5 w-5 text-emerald-600" /><p className="font-semibold">Secure & trusted</p><p className="text-sm text-slate-600">Privacy-first platform trusted by Indian users.</p></CardContent></Card>
-            <Card className="border-0 bg-white shadow-sm"><CardContent className="p-5"><BadgeCheck className="mb-2 h-5 w-5 text-amber-600" /><p className="font-semibold">Transparent rankings</p><p className="text-sm text-slate-600">Sponsored listings marked clearly for trust.</p></CardContent></Card>
-            <Card className="border-0 bg-white shadow-sm"><CardContent className="p-5"><Building2 className="mb-2 h-5 w-5 text-[#0B3C5D]" /><p className="font-semibold">Made for India</p><p className="text-sm text-slate-600">Optimized for low bandwidth and mobile devices.</p></CardContent></Card>
+        <section id="financial-products" className="container mx-auto px-4 pb-16">
+          <div className="mb-6 flex items-center gap-2">
+            <CreditCard className="h-5 w-5 text-slate-700" />
+            <h2 className="text-2xl font-semibold">Premium Financial Products</h2>
           </div>
+
+          <div className="space-y-6">
+            {PRODUCT_CATEGORIES.map((section) => (
+              <Card key={section.category} className="rounded-2xl border-slate-200 bg-white shadow-sm">
+                <CardContent className="p-6">
+                  <h3 className="mb-4 text-lg font-semibold">{section.category}</h3>
+
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {section.products.map((product) => (
+                      <Card
+                        key={product.name}
+                        className="rounded-xl border-slate-200 bg-gradient-to-b from-white to-slate-50 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                      >
+                        <CardContent className="p-5">
+                          <div className="mb-3 inline-flex rounded-full bg-slate-100 p-2">
+                            <product.icon className="h-4 w-4 text-slate-700" />
+                          </div>
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{product.provider}</p>
+                          <h4 className="mt-1 text-base font-semibold">{product.name}</h4>
+                          <p className="mt-2 text-sm text-slate-600">{product.description}</p>
+
+                          <ul className="mt-3 space-y-1 text-sm text-slate-700">
+                            {product.highlights.map((item) => (
+                              <li key={item}>• {item}</li>
+                            ))}
+                          </ul>
+
+                          <div className="mt-4 flex gap-2">
+                            <Button asChild className="rounded-full bg-slate-900 hover:bg-slate-800">
+                              <Link to={product.href}>{product.cta}</Link>
+                            </Button>
+                            <Button asChild variant="outline" className="rounded-full">
+                              <Link to={product.href}>Know More</Link>
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-16">
+          <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold">Performance & AdSense readiness upgrades done</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Homepage is now lightweight and avoids heavy IFSC dataset loading at first paint. This improves FCP/LCP potential,
+                keeps navigation clean, and supports policy-first monetization pages.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button asChild variant="outline" className="rounded-full"><Link to="/privacy">Privacy Policy</Link></Button>
+                <Button asChild variant="outline" className="rounded-full"><Link to="/terms">Terms</Link></Button>
+                <Button asChild variant="outline" className="rounded-full"><Link to="/disclaimer">Disclaimer</Link></Button>
+                <Button asChild variant="outline" className="rounded-full"><Link to="/contact">Contact</Link></Button>
+              </div>
+            </CardContent>
+          </Card>
         </section>
       </main>
-
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-white/95 backdrop-blur md:hidden">
-        <nav className="mx-auto grid max-w-lg grid-cols-5 gap-1 px-2 py-2 text-xs">
-          {[
-            { label: 'Home', href: '/', icon: Search },
-            { label: 'Tools', href: '/tools', icon: Calculator },
-            { label: 'Compare', href: '/credit-cards', icon: GitBranch },
-            { label: 'Products', href: '/banks', icon: Landmark },
-            { label: 'Profile', href: '/about', icon: Wallet },
-          ].map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.label} to={item.href} className="flex flex-col items-center rounded-lg py-1 text-slate-600 hover:bg-slate-100 hover:text-[#0B3C5D]">
-                <Icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
 
       <Footer />
     </div>

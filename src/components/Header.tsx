@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Home, Calculator, CreditCard, Search } from 'lucide-react';
+import { Menu, X, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/logo.jpeg';
@@ -12,9 +12,9 @@ export function Header() {
   const navigate = useNavigate();
 
   const navLinks = [
-    { to: '/', label: 'Home', icon: Home },
-    { to: '/#ifsc-tools', label: 'IFSC Tools', icon: Calculator },
-    { to: '/#financial-products', label: 'Financial Products', icon: CreditCard },
+    { to: '/', label: 'Home' },
+    { to: '/tools', label: 'Financial Tools' },
+    { to: '/#financial-products', label: 'Financial Products' },
   ];
 
   return (
@@ -56,19 +56,24 @@ export function Header() {
           <nav className="hidden items-center gap-1 lg:flex">
             {navLinks.map((link) => {
               const hashTarget = link.to.includes('#') ? `#${link.to.split('#')[1]}` : '';
-              const isActive = link.to === '/' ? location.pathname === '/' && !location.hash : location.hash === hashTarget;
-              const isActive = link.to === '/' ? location.pathname === '/' : location.hash === link.to.split('#')[1];
+              const isRoot = link.to === '/';
+              const isHashLink = link.to.startsWith('/#');
+              const isPathLink = !isRoot && !isHashLink;
+              const isActive = isRoot
+                ? location.pathname === '/' && !location.hash
+                : isHashLink
+                  ? location.pathname === '/' && location.hash === hashTarget
+                  : isPathLink && location.pathname === link.to;
 
               return (
                 <a
                   key={link.to}
                   href={link.to}
                   className={cn(
-                    'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
+                    'rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
                     isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <link.icon className="h-4 w-4" />
                   {link.label}
                 </a>
               );
@@ -89,10 +94,9 @@ export function Header() {
                 <a
                   key={link.to}
                   href={link.to}
-                  className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground"
+                  className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <link.icon className="h-5 w-5" />
                   {link.label}
                 </a>
               ))}

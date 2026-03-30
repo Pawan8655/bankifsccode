@@ -57,7 +57,6 @@ export function Header() {
             {navLinks.map((link) => {
               const hashTarget = link.to.includes('#') ? `#${link.to.split('#')[1]}` : '';
               const isActive = link.to === '/' ? location.pathname === '/' && !location.hash : location.hash === hashTarget;
-              const isActive = link.to === '/' ? location.pathname === '/' : location.hash === link.to.split('#')[1];
 
               return (
                 <a

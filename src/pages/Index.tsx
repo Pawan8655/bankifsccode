@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, CreditCard, Landmark, MapPin, PiggyBank, Search, Shield, TrendingUp } from 'lucide-react';
+import { Building2, Landmark, MapPin, Search, Shield } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Loader } from '@/components/Loader';
@@ -26,13 +26,10 @@ type Tool = {
   icon: typeof Search;
 };
 
-type Product = {
-  name: string;
-  provider: string;
+type ProductCategory = {
+  title: string;
   description: string;
   href: string;
-  cta: string;
-  icon: typeof CreditCard;
 };
 
 const POPULAR_BANKS = ['State Bank of India', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Punjab National Bank', 'Canara Bank'];
@@ -46,30 +43,31 @@ const TOOLS: Tool[] = [
   { title: 'IMPS IFSC Search', description: 'Find valid IFSC quickly for IMPS payments.', href: '/imps-ifsc-search', icon: Building2 },
 ];
 
-const PRODUCTS: Product[] = [
+const PRODUCT_CATEGORIES: ProductCategory[] = [
   {
-    name: 'HDFC Millennia Credit Card',
-    provider: 'HDFC Bank',
-    description: 'Cashback-focused card for online and lifestyle spends.',
-    href: '/credit-cards/hdfc-millennia-credit-card',
-    cta: 'Apply Now',
-    icon: CreditCard,
+    title: 'Credit Cards',
+    description: 'Best cashback, rewards, and travel card categories.',
+    href: '/credit-cards',
   },
   {
-    name: 'SBI Zero Balance Savings Account',
-    provider: 'State Bank of India',
-    description: 'Trusted savings account with zero-balance variant.',
-    href: '/bank-accounts/sbi-zero-balance-savings-account',
-    cta: 'Open Account',
-    icon: PiggyBank,
+    title: 'Bank Accounts',
+    description: 'Savings and salary account category pages by banks.',
+    href: '/bank-accounts',
   },
   {
-    name: 'Zerodha Demat Account',
-    provider: 'Zerodha',
-    description: 'Low brokerage demat and trading account option.',
-    href: '/demat-accounts/zerodha-account',
-    cta: 'Open Demat',
-    icon: TrendingUp,
+    title: 'Demat Accounts',
+    description: 'Top demat and trading account category options.',
+    href: '/demat-accounts',
+  },
+  {
+    title: 'Personal Loans',
+    description: 'Compare personal loan category pages with basics.',
+    href: '/personal-loans',
+  },
+  {
+    title: 'Health Insurance',
+    description: 'Explore mediclaim and health policy categories.',
+    href: '/health-insurance',
   },
 ];
 
@@ -119,10 +117,10 @@ export default function Index() {
         <section className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-100/70">
           <div className="container mx-auto px-4 py-10 sm:py-16">
             <div className="mx-auto max-w-4xl text-center">
-              <Badge className="mb-4 border-0 bg-slate-900 text-white">Fast IFSC Finder for India</Badge>
-              <h1 className="text-3xl font-bold leading-tight sm:text-5xl">Find IFSC code instantly, branch-wise.</h1>
+              <Badge className="mb-4 border-0 bg-primary text-primary-foreground">Best IFSC Code Finder</Badge>
+              <h1 className="text-3xl font-bold leading-tight sm:text-5xl">Find IFSC Code Fast & Correct Every Time</h1>
               <p className="mx-auto mt-4 max-w-2xl text-sm text-slate-600 sm:text-base">
-                Search IFSC codes, MICR details, and bank branch information in one clean and fast interface.
+                Search IFSC code, branch details, and MICR in one simple page. Fast, mobile-friendly, and easy to use.
               </p>
 
               <div className="mx-auto mt-8 max-w-3xl">
@@ -150,6 +148,15 @@ export default function Index() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              <div className="mt-5 flex flex-wrap justify-center gap-3">
+                <Button asChild className="rounded-full">
+                  <Link to="/banks">Open IFSC Finder</Link>
+                </Button>
+                <Button asChild variant="outline" className="rounded-full">
+                  <Link to="/tools">Explore Financial Tools</Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -182,21 +189,19 @@ export default function Index() {
         </section>
 
         <section id="financial-products" className="container mx-auto px-4 pb-16">
-          <div className="mb-4 flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-slate-700" />
-            <h2 className="text-xl font-semibold sm:text-2xl">Financial Products</h2>
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold sm:text-2xl">Financial Product Categories</h2>
+            <p className="mt-1 text-sm text-slate-600">Home page par sirf categories dikhayi gayi hain for clean look.</p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {PRODUCTS.map((product) => (
-              <Card key={product.name} className="rounded-2xl border-slate-200 bg-white shadow-sm">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {PRODUCT_CATEGORIES.map((category) => (
+              <Card key={category.title} className="rounded-2xl border-slate-200 bg-white shadow-sm">
                 <CardContent className="p-5">
-                  <product.icon className="mb-2 h-5 w-5 text-slate-700" />
-                  <p className="text-xs uppercase tracking-wide text-slate-500">{product.provider}</p>
-                  <h3 className="mt-1 font-semibold">{product.name}</h3>
-                  <p className="mt-2 text-sm text-slate-600">{product.description}</p>
-                  <Button asChild className="mt-4 w-full rounded-full bg-slate-900 hover:bg-slate-800">
-                    <Link to={product.href}>{product.cta}</Link>
+                  <h3 className="mt-1 font-semibold">{category.title}</h3>
+                  <p className="mt-2 text-sm text-slate-600">{category.description}</p>
+                  <Button asChild variant="outline" className="mt-4 w-full rounded-full">
+                    <Link to={category.href}>View Category</Link>
                   </Button>
                 </CardContent>
               </Card>

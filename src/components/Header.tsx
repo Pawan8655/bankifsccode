@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Home, Calculator, CreditCard, Search } from 'lucide-react';
+import { Menu, X, Home, Calculator, CreditCard, Search, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/logo.jpeg';
@@ -14,6 +14,7 @@ export function Header() {
   const navLinks = [
     { to: '/', label: 'Home', icon: Home },
     { to: '/#ifsc-tools', label: 'IFSC Tools', icon: Calculator },
+    { to: '/tools', label: 'Financial Tools', icon: TrendingUp },
     { to: '/#financial-products', label: 'Financial Products', icon: CreditCard },
   ];
 
@@ -56,7 +57,14 @@ export function Header() {
           <nav className="hidden items-center gap-1 lg:flex">
             {navLinks.map((link) => {
               const hashTarget = link.to.includes('#') ? `#${link.to.split('#')[1]}` : '';
-              const isActive = link.to === '/' ? location.pathname === '/' && !location.hash : location.hash === hashTarget;
+              const isRoot = link.to === '/';
+              const isHashLink = link.to.startsWith('/#');
+              const isPathLink = !isRoot && !isHashLink;
+              const isActive = isRoot
+                ? location.pathname === '/' && !location.hash
+                : isHashLink
+                  ? location.pathname === '/' && location.hash === hashTarget
+                  : isPathLink && location.pathname === link.to;
 
               return (
                 <a

@@ -26,12 +26,10 @@ type Tool = {
   icon: typeof Search;
 };
 
-type Product = {
-  name: string;
-  provider: string;
+type ProductCategory = {
+  title: string;
   description: string;
   href: string;
-  cta: string;
   icon: typeof CreditCard;
 };
 
@@ -46,30 +44,36 @@ const TOOLS: Tool[] = [
   { title: 'IMPS IFSC Search', description: 'Find valid IFSC quickly for IMPS payments.', href: '/imps-ifsc-search', icon: Building2 },
 ];
 
-const PRODUCTS: Product[] = [
+const PRODUCT_CATEGORIES: ProductCategory[] = [
   {
-    name: 'HDFC Millennia Credit Card',
-    provider: 'HDFC Bank',
-    description: 'Cashback-focused card for online and lifestyle spends.',
-    href: '/credit-cards/hdfc-millennia-credit-card',
-    cta: 'Apply Now',
+    title: 'Credit Cards',
+    description: 'Best cashback, rewards, and travel card categories.',
+    href: '/credit-cards',
     icon: CreditCard,
   },
   {
-    name: 'SBI Zero Balance Savings Account',
-    provider: 'State Bank of India',
-    description: 'Trusted savings account with zero-balance variant.',
-    href: '/bank-accounts/sbi-zero-balance-savings-account',
-    cta: 'Open Account',
+    title: 'Bank Accounts',
+    description: 'Savings and salary account category pages by banks.',
+    href: '/bank-accounts',
     icon: PiggyBank,
   },
   {
-    name: 'Zerodha Demat Account',
-    provider: 'Zerodha',
-    description: 'Low brokerage demat and trading account option.',
-    href: '/demat-accounts/zerodha-account',
-    cta: 'Open Demat',
+    title: 'Demat Accounts',
+    description: 'Top demat and trading account category options.',
+    href: '/demat-accounts',
     icon: TrendingUp,
+  },
+  {
+    title: 'Personal Loans',
+    description: 'Compare personal loan category pages with basics.',
+    href: '/personal-loans',
+    icon: Building2,
+  },
+  {
+    title: 'Health Insurance',
+    description: 'Explore mediclaim and health policy categories.',
+    href: '/health-insurance',
+    icon: Landmark,
   },
 ];
 
@@ -184,19 +188,18 @@ export default function Index() {
         <section id="financial-products" className="container mx-auto px-4 pb-16">
           <div className="mb-4 flex items-center gap-2">
             <CreditCard className="h-5 w-5 text-slate-700" />
-            <h2 className="text-xl font-semibold sm:text-2xl">Financial Products</h2>
+            <h2 className="text-xl font-semibold sm:text-2xl">Financial Product Categories</h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {PRODUCTS.map((product) => (
-              <Card key={product.name} className="rounded-2xl border-slate-200 bg-white shadow-sm">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {PRODUCT_CATEGORIES.map((category) => (
+              <Card key={category.title} className="rounded-2xl border-slate-200 bg-white shadow-sm">
                 <CardContent className="p-5">
-                  <product.icon className="mb-2 h-5 w-5 text-slate-700" />
-                  <p className="text-xs uppercase tracking-wide text-slate-500">{product.provider}</p>
-                  <h3 className="mt-1 font-semibold">{product.name}</h3>
-                  <p className="mt-2 text-sm text-slate-600">{product.description}</p>
-                  <Button asChild className="mt-4 w-full rounded-full bg-slate-900 hover:bg-slate-800">
-                    <Link to={product.href}>{product.cta}</Link>
+                  <category.icon className="mb-2 h-5 w-5 text-slate-700" />
+                  <h3 className="mt-1 font-semibold">{category.title}</h3>
+                  <p className="mt-2 text-sm text-slate-600">{category.description}</p>
+                  <Button asChild variant="outline" className="mt-4 w-full rounded-full">
+                    <Link to={category.href}>View Category</Link>
                   </Button>
                 </CardContent>
               </Card>

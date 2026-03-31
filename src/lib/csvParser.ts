@@ -94,6 +94,20 @@ export type IFSCLookup = {
   branchesMap: Map<string, Map<string, Map<string, IFSCData[]>>>; // Bank -> State -> City -> Branches[]
 };
 
+// Remove duplicate rows that share the same IFSC code.
+// Some source files can contain repeated records and that makes the UI show same branch twice.
+export function dedupeByIFSC(data: IFSCData[]): IFSCData[] {
+  const seen = new Set<string>();
+
+  return data.filter((item) => {
+    const key = (item.IFSC || "").trim().toUpperCase();
+    if (!key) return false;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 // Build optimized indices for O(1) lookups
 export function buildIndices(data: IFSCData[]): IFSCLookup {
   const banks = new Set<string>();

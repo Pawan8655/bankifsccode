@@ -41,6 +41,7 @@ const App = () => (
             <Route path="/banks" element={<Banks />} />
             <Route path="/bank/:bankName" element={<BankDetails />} />
             <Route path="/bank/:bankName/:stateName" element={<BankDetails />} />
+            <Route path="/bank/:bankName/:stateName/:cityName/:branchName" element={<BranchPage />} />
             <Route path="/bank/:bankName/:stateName/:cityName" element={<BankDetails />} />
             <Route path="/branch/:ifsc" element={<BranchPage />} />
             <Route path="/tools" element={<Calculators />} />

@@ -27,14 +27,22 @@ function buildMetaDescription(bank: string, branch: string, city: string, state:
 }
 
 export default function BranchPage() {
-  const { ifsc } = useParams();
+  const { ifsc, bankName, stateName, cityName, branchName } = useParams();
   const { data, indices, loading, error } = useIFSCData();
 
   const branch = useMemo(() => {
-    if (!ifsc) return undefined;
-    return getBranchByIFSC(data, ifsc);
-    // Note: We could speed this up by indexing by IFSC, but linear scan is fast enough for single item.
-  }, [data, ifsc]);
+    if (ifsc) return getBranchByIFSC(data, ifsc);
+
+    if (!bankName || !stateName || !cityName || !branchName) return undefined;
+    const bank = decodeURIComponent(bankName);
+    const state = decodeURIComponent(stateName);
+    const city = decodeURIComponent(cityName);
+    const branchParam = decodeURIComponent(branchName);
+
+    return data.find((item) =>
+      item.Bank === bank && item.State === state && item.City === city && item.Branch === branchParam,
+    );
+  }, [data, ifsc, bankName, stateName, cityName, branchName]);
 
   const relatedBranches = useMemo(() => {
     if (!branch) return [];
@@ -77,7 +85,7 @@ export default function BranchPage() {
       <SEO
         title={seoTitle}
         description={seoDescription}
-        path={`/branch/${encodeURIComponent(ifsc || '')}`}
+        path={branch ? `/bank/${encodeURIComponent(branch.Bank)}/${encodeURIComponent(branch.State)}/${encodeURIComponent(branch.City)}/${encodeURIComponent(branch.Branch)}` : `/branch/${encodeURIComponent(ifsc || '')}`}
         keywords={seoKeywords}
       />
       <Header />
@@ -228,7 +236,7 @@ export default function BranchPage() {
                     {relatedBranches.map((b) => (
                       <Link
                         key={b.IFSC}
-                        to={`/branch/${b.IFSC}`}
+                        to={`/bank/${encodeURIComponent(b.Bank)}/${encodeURIComponent(b.State)}/${encodeURIComponent(b.City)}/${encodeURIComponent(b.Branch)}`}
                         className="p-4 rounded-lg border border-border/50 bg-card hover:border-primary/50 hover:shadow-lg transition-all"
                       >
                         <h3 className="font-medium text-foreground mb-1 line-clamp-1">{b.Branch}</h3>

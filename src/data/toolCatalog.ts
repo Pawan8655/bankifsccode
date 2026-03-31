@@ -13,69 +13,107 @@ export interface ToolDefinition {
   fields: ToolField[];
 }
 
+const MONEY_FIELDS: ToolField[] = [
+  { key: 'amount', label: 'Amount (₹)', defaultValue: 100000 },
+  { key: 'rate', label: 'Rate (%)', defaultValue: 10 },
+  { key: 'years', label: 'Years', defaultValue: 5 },
+];
+
+const QUICK_FIELDS: ToolField[] = [
+  { key: 'value1', label: 'Value 1', defaultValue: 100 },
+  { key: 'value2', label: 'Value 2', defaultValue: 50 },
+];
+
+const TEXT_QUERY: ToolField[] = [{ key: 'query', label: 'Search Query', type: 'text', defaultValue: '' }];
+
+const tool = (slug: string, title: string, category: string, description: string, fields: ToolField[] = MONEY_FIELDS): ToolDefinition => ({
+  slug,
+  title,
+  category,
+  description,
+  fields,
+});
+
+const CORE_TOOLS: ToolDefinition[] = [
+  tool('ifsc-code-finder', 'IFSC Code Finder', 'Banking Tools', 'Search branch-wise IFSC code finder India results.', TEXT_QUERY),
+  tool('micr-code-finder', 'MICR Code Finder', 'Banking Tools', 'Find MICR code online for cheque and ECS details.', TEXT_QUERY),
+  tool('bank-branch-details', 'Bank Branch Details India', 'Banking Tools', 'Get bank branch details India by bank, state, city, branch.', TEXT_QUERY),
+  tool('emi-calculator', 'EMI Calculator', 'Financial Calculators', 'Calculate monthly EMI, interest and total repayment for any loan.'),
+  tool('loan-calculator', 'Loan Calculator', 'Financial Calculators', 'Quick loan repayment planning with interest breakup.'),
+  tool('interest-calculator', 'Interest Calculator', 'Financial Calculators', 'Simple interest planning for savings and loans.'),
+  tool('compound-interest-calculator', 'Compound Interest Calculator', 'Financial Calculators', 'Estimate yearly compounding growth and maturity value.'),
+  tool('mortgage-calculator', 'Mortgage Calculator', 'Financial Calculators', 'Estimate mortgage EMI and long-term interest outgo.'),
+  tool('amortization-calculator', 'Amortization Calculator', 'Financial Calculators', 'View principal and interest split month by month.'),
+  tool('sip-calculator', 'SIP Calculator', 'Financial Calculators', 'Calculate SIP maturity, invested amount and returns.'),
+  tool('fd-calculator', 'FD Calculator', 'Financial Calculators', 'Project fixed deposit maturity with compounding.'),
+  tool('rd-calculator', 'RD Calculator', 'Financial Calculators', 'Calculate recurring deposit corpus for goal planning.'),
+  tool('roi-calculator', 'Financial Calculators', 'Financial Calculators', 'Check return on investment percentage and amount.', QUICK_FIELDS),
+  tool('irr-calculator', 'IRR Calculator', 'Financial Calculators', 'Estimate internal rate of return for cashflow series.', QUICK_FIELDS),
+  tool('payback-period-calculator', 'Payback Period Calculator', 'Financial Calculators', 'Find years required to recover initial investment.', QUICK_FIELDS),
+  tool('present-value-calculator', 'Present Value Calculator', 'Financial Calculators', 'Discount future cashflows to current value.'),
+  tool('future-value-calculator', 'Future Value Calculator', 'Financial Calculators', 'Estimate future value of current investment.'),
+  tool('retirement-calculator', 'Retirement Calculator', 'Financial Calculators', 'Plan retirement corpus and monthly post-retirement income.'),
+  tool('pension-calculator', 'Pension Calculator', 'Financial Calculators', 'Estimate pension corpus and annuity income.'),
+  tool('income-tax-calculator', 'Income Tax Calculator', 'Financial Calculators', 'Calculate tax liability as per India slabs.'),
+  tool('salary-calculator', 'Salary Calculator', 'Financial Calculators', 'Convert CTC to in-hand salary estimate.'),
+  tool('gst-calculator', 'GST Calculator', 'Financial Calculators', 'Find GST inclusive and exclusive amounts.'),
+  tool('credit-card-calculator', 'Credit Card Calculator', 'Financial Calculators', 'Estimate revolving credit card interest cost.', QUICK_FIELDS),
+  tool('debt-payoff-calculator', 'Debt Payoff Calculator', 'Financial Calculators', 'Plan debt snowball or avalanche payoff timeline.', QUICK_FIELDS),
+  tool('personal-loan-calculator', 'Personal Loan Calculator', 'Financial Calculators', 'Compare personal loan EMI options quickly.'),
+  tool('business-loan-calculator', 'Business Loan Calculator', 'Financial Calculators', 'Estimate MSME or business loan EMI and cost.'),
+  tool('budget-calculator', 'Budget Calculator', 'Financial Calculators', 'Track income vs expenses and savings rate.', QUICK_FIELDS),
+  tool('commission-calculator', 'Commission Calculator', 'Financial Calculators', 'Calculate sales commission and payout.', QUICK_FIELDS),
+];
+
+const AUTO_TOOLS = [
+  'Auto Loan Calculator', 'Lease Calculator', 'Mileage Calculator', 'Fuel Cost Calculator', 'Car Affordability Calculator', 'Road Trip Cost Calculator', 'Bike Loan Calculator',
+].map((title) => tool(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''), title, 'Auto Calculators', `${title} for car and vehicle planning.`, QUICK_FIELDS));
+
+const INVESTMENT_TOOLS = [
+  'Mutual Fund Calculator', 'Stock Return Calculator', 'Bond Calculator', 'Average Return Calculator', 'Lumpsum Calculator', 'CAGR Calculator', 'XIRR Calculator', 'Dividend Yield Calculator', 'Asset Allocation Calculator', 'Risk Reward Calculator', 'ETF Return Calculator', 'PPF Calculator', 'NPS Calculator', 'Sukanya Samriddhi Calculator', 'Gold Investment Calculator', 'SWP Calculator',
+].map((title) => tool(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''), title, 'Investment Tools', `${title} to plan better investing decisions.`, MONEY_FIELDS));
+
+const HEALTH_TOOLS = [
+  'BMI Calculator', 'Calorie Calculator', 'BMR Calculator', 'Body Fat Calculator', 'Ideal Weight Calculator', 'Pregnancy Calculator', 'Ovulation Calculator', 'Water Intake Calculator', 'Protein Intake Calculator', 'Macro Calculator', 'Body Surface Area Calculator', 'Heart Rate Zone Calculator', 'Due Date Calculator', 'TDEE Calculator',
+].map((title) => tool(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''), title, 'Health Calculators', `${title} with easy inputs and quick output.`, QUICK_FIELDS));
+
+const MATH_TOOLS = [
+  'Percentage Calculator', 'Scientific Calculator', 'Fraction Calculator', 'Probability Calculator', 'Standard Deviation Calculator', 'Mean Median Mode Calculator', 'Matrix Calculator', 'Log Calculator', 'LCM HCF Calculator', 'Ratio Calculator', 'Permutation Combination Calculator', 'Quadratic Equation Calculator', 'Prime Number Calculator', 'Simple Algebra Calculator', 'Geometry Calculator',
+].map((title) => tool(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''), title, 'Math Calculators', `${title} for students and daily problem solving.`, QUICK_FIELDS));
+
+const UTILITY_TOOLS = [
+  'Age Calculator', 'Date Calculator', 'Time Calculator', 'GPA Calculator', 'Grade Calculator', 'Tip Calculator', 'Inflation Calculator', 'Currency Converter', 'Unit Converter', 'Password Generator', 'IP Subnet Calculator', 'Random Number Generator', 'Binary Converter', 'Text Case Converter', 'URL Encoder Decoder', 'File Size Converter', 'Loan Comparison Tool', 'Investment Comparison Tool', 'Savings Goal Calculator', 'Emergency Fund Calculator',
+].map((title) => tool(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''), title, 'Utility Calculators', `${title} for daily productivity and finance utility.`, QUICK_FIELDS));
+
+const ADVANCED_TOOLS = [
+  'Ohms Law Calculator', 'Voltage Calculator', 'Speed Calculator', 'Density Calculator', 'Power Calculator', 'Current Calculator', 'Resistor Color Code Calculator', 'Bandwidth Calculator', 'Data Transfer Calculator', 'Simple Machine Calculator', 'Break-even Calculator', 'Profit Margin Calculator', 'Inventory Turnover Calculator', 'Working Capital Calculator', 'Depreciation Calculator', 'NPV Calculator', 'Scenario Analysis Calculator', 'Cash Flow Calculator', 'Net Worth Calculator', 'Credit Utilization Calculator',
+].map((title) => tool(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''), title, 'Advanced Tools', `${title} for advanced professional use cases.`, QUICK_FIELDS));
+
 export const TOOL_CATALOG: ToolDefinition[] = [
-  { slug: 'emi-calculator', title: 'EMI Calculator', category: 'Core Finance Calculators', description: 'Calculate monthly EMI, interest and repayment.', fields: [{ key: 'principal', label: 'Loan Amount (₹)', defaultValue: 500000 }, { key: 'rate', label: 'Interest Rate (%)', defaultValue: 10 }, { key: 'years', label: 'Tenure (Years)', defaultValue: 5 }] },
-  { slug: 'sip-calculator', title: 'SIP Calculator', category: 'Core Finance Calculators', description: 'Estimate SIP maturity value and returns.', fields: [{ key: 'monthly', label: 'Monthly SIP (₹)', defaultValue: 5000 }, { key: 'rate', label: 'Expected Return (%)', defaultValue: 12 }, { key: 'years', label: 'Years', defaultValue: 15 }] },
-  { slug: 'lumpsum-calculator', title: 'Lumpsum Calculator', category: 'Core Finance Calculators', description: 'Find future value of one-time investment.', fields: [{ key: 'amount', label: 'Investment (₹)', defaultValue: 100000 }, { key: 'rate', label: 'Expected Return (%)', defaultValue: 12 }, { key: 'years', label: 'Years', defaultValue: 10 }] },
-  { slug: 'compound-interest-calculator', title: 'Compound Interest Calculator', category: 'Core Finance Calculators', description: 'Calculate compound growth over time.', fields: [{ key: 'principal', label: 'Principal (₹)', defaultValue: 50000 }, { key: 'rate', label: 'Annual Rate (%)', defaultValue: 8 }, { key: 'years', label: 'Years', defaultValue: 6 }] },
-  { slug: 'simple-interest-calculator', title: 'Simple Interest Calculator', category: 'Core Finance Calculators', description: 'Calculate simple interest quickly.', fields: [{ key: 'principal', label: 'Principal (₹)', defaultValue: 50000 }, { key: 'rate', label: 'Annual Rate (%)', defaultValue: 8 }, { key: 'years', label: 'Years', defaultValue: 3 }] },
-  { slug: 'fd-calculator', title: 'FD Calculator', category: 'Core Finance Calculators', description: 'Estimate fixed deposit maturity amount.', fields: [{ key: 'principal', label: 'Deposit Amount (₹)', defaultValue: 100000 }, { key: 'rate', label: 'FD Rate (%)', defaultValue: 7.25 }, { key: 'years', label: 'Years', defaultValue: 3 }] },
-  { slug: 'rd-calculator', title: 'RD Calculator', category: 'Core Finance Calculators', description: 'Calculate recurring deposit maturity.', fields: [{ key: 'monthly', label: 'Monthly RD (₹)', defaultValue: 5000 }, { key: 'rate', label: 'RD Rate (%)', defaultValue: 7 }, { key: 'years', label: 'Years', defaultValue: 5 }] },
-  { slug: 'loan-eligibility-calculator', title: 'Loan Eligibility Calculator', category: 'Core Finance Calculators', description: 'Estimate eligible loan amount from income.', fields: [{ key: 'income', label: 'Monthly Income (₹)', defaultValue: 70000 }, { key: 'obligations', label: 'Monthly EMIs (₹)', defaultValue: 10000 }, { key: 'years', label: 'Loan Years', defaultValue: 20 }] },
-  { slug: 'loan-prepayment-calculator', title: 'Loan Prepayment Calculator', category: 'Core Finance Calculators', description: 'Check impact of part-prepayment.', fields: [{ key: 'outstanding', label: 'Outstanding Principal (₹)', defaultValue: 1200000 }, { key: 'prepay', label: 'Prepayment (₹)', defaultValue: 200000 }, { key: 'rate', label: 'Rate (%)', defaultValue: 9 }] },
-  { slug: 'interest-rate-calculator', title: 'Interest Rate Calculator', category: 'Core Finance Calculators', description: 'Estimate implied interest rate.', fields: [{ key: 'principal', label: 'Principal (₹)', defaultValue: 300000 }, { key: 'interest', label: 'Interest Paid (₹)', defaultValue: 54000 }, { key: 'years', label: 'Years', defaultValue: 3 }] },
-  { slug: 'ifsc-code-finder', title: 'IFSC Code Finder', category: 'Banking Tools', description: 'Find bank IFSC code and branch details.', fields: [{ key: 'query', label: 'Bank / Branch / IFSC', type: 'text', defaultValue: '' }] },
-  { slug: 'micr-code-finder', title: 'MICR Code Finder', category: 'Banking Tools', description: 'Lookup MICR code for bank branch.', fields: [{ key: 'query', label: 'Bank / Branch Name', type: 'text', defaultValue: '' }] },
-  { slug: 'bank-holiday-checker', title: 'Bank Holiday Checker', category: 'Banking Tools', description: 'Check bank holidays by state and month.', fields: [{ key: 'month', label: 'Month (1-12)', defaultValue: 4 }, { key: 'year', label: 'Year', defaultValue: 2026 }] },
-  { slug: 'gst-calculator', title: 'GST Calculator', category: 'Banking Tools', description: 'Calculate GST inclusive/exclusive values.', fields: [{ key: 'amount', label: 'Amount (₹)', defaultValue: 1000 }, { key: 'rate', label: 'GST Rate (%)', defaultValue: 18 }] },
-  { slug: 'currency-converter', title: 'Currency Converter', category: 'Banking Tools', description: 'Convert INR and global currency values.', fields: [{ key: 'amount', label: 'Amount', defaultValue: 100 }, { key: 'rate', label: 'Exchange Rate', defaultValue: 83.5 }] },
-  { slug: 'swift-code-finder', title: 'SWIFT Code Finder', category: 'Banking Tools', description: 'Find SWIFT/BIC for international transfers.', fields: [{ key: 'query', label: 'Bank Name / City', type: 'text', defaultValue: '' }] },
-  { slug: 'credit-card-emi-calculator', title: 'Credit Card EMI Calculator', category: 'Credit & Loan Tools', description: 'Estimate credit card conversion EMI.', fields: [{ key: 'amount', label: 'Amount (₹)', defaultValue: 50000 }, { key: 'rate', label: 'Interest (%)', defaultValue: 16 }, { key: 'months', label: 'Months', defaultValue: 12 }] },
-  { slug: 'personal-loan-calculator', title: 'Personal Loan Calculator', category: 'Credit & Loan Tools', description: 'Plan personal loan repayment.', fields: [{ key: 'principal', label: 'Loan Amount (₹)', defaultValue: 300000 }, { key: 'rate', label: 'Rate (%)', defaultValue: 13 }, { key: 'years', label: 'Years', defaultValue: 4 }] },
-  { slug: 'home-loan-calculator', title: 'Home Loan Calculator', category: 'Credit & Loan Tools', description: 'Calculate home loan EMI and cost.', fields: [{ key: 'principal', label: 'Loan Amount (₹)', defaultValue: 3500000 }, { key: 'rate', label: 'Rate (%)', defaultValue: 8.75 }, { key: 'years', label: 'Years', defaultValue: 20 }] },
-  { slug: 'car-loan-calculator', title: 'Car Loan Calculator', category: 'Credit & Loan Tools', description: 'Estimate car loan EMI.', fields: [{ key: 'principal', label: 'Loan Amount (₹)', defaultValue: 900000 }, { key: 'rate', label: 'Rate (%)', defaultValue: 9.5 }, { key: 'years', label: 'Years', defaultValue: 7 }] },
-  { slug: 'debt-consolidation-calculator', title: 'Debt Consolidation Calculator', category: 'Credit & Loan Tools', description: 'Compare debt consolidation savings.', fields: [{ key: 'currentEmi', label: 'Current Total EMI (₹)', defaultValue: 32000 }, { key: 'newEmi', label: 'New Consolidated EMI (₹)', defaultValue: 25000 }, { key: 'months', label: 'Months', defaultValue: 48 }] },
-  { slug: 'credit-score-estimator', title: 'Credit Score Estimator', category: 'Credit & Loan Tools', description: 'Estimate score trend from payment behavior.', fields: [{ key: 'onTime', label: 'On-time Payments (%)', defaultValue: 92 }, { key: 'util', label: 'Credit Utilization (%)', defaultValue: 35 }] },
-  { slug: 'mutual-fund-calculator', title: 'Mutual Fund Calculator', category: 'Investment Tools', description: 'Project mutual fund growth and returns.', fields: [{ key: 'amount', label: 'Investment (₹)', defaultValue: 100000 }, { key: 'rate', label: 'Expected Return (%)', defaultValue: 11 }, { key: 'years', label: 'Years', defaultValue: 12 }] },
-  { slug: 'stock-return-calculator', title: 'Stock Return Calculator', category: 'Investment Tools', description: 'Check stock gain/loss in % and amount.', fields: [{ key: 'buy', label: 'Buy Price (₹)', defaultValue: 1500 }, { key: 'sell', label: 'Sell Price (₹)', defaultValue: 2100 }, { key: 'qty', label: 'Quantity', defaultValue: 20 }] },
-  { slug: 'cagr-calculator', title: 'CAGR Calculator', category: 'Investment Tools', description: 'Calculate annualized growth rate.', fields: [{ key: 'start', label: 'Starting Value', defaultValue: 100000 }, { key: 'end', label: 'Ending Value', defaultValue: 220000 }, { key: 'years', label: 'Years', defaultValue: 8 }] },
-  { slug: 'inflation-calculator', title: 'Inflation Calculator', category: 'Investment Tools', description: 'Estimate inflation-adjusted value.', fields: [{ key: 'amount', label: 'Current Amount (₹)', defaultValue: 50000 }, { key: 'inflation', label: 'Inflation (%)', defaultValue: 6 }, { key: 'years', label: 'Years', defaultValue: 10 }] },
-  { slug: 'retirement-planner', title: 'Retirement Planner', category: 'Investment Tools', description: 'Estimate required retirement corpus.', fields: [{ key: 'monthlyExpense', label: 'Monthly Expense (₹)', defaultValue: 45000 }, { key: 'inflation', label: 'Inflation (%)', defaultValue: 6 }, { key: 'years', label: 'Years to Retirement', defaultValue: 25 }] },
-  { slug: 'ppf-calculator', title: 'PPF Calculator', category: 'Investment Tools', description: 'Project PPF maturity and interest.', fields: [{ key: 'yearly', label: 'Yearly Investment (₹)', defaultValue: 150000 }, { key: 'rate', label: 'PPF Rate (%)', defaultValue: 7.1 }, { key: 'years', label: 'Years', defaultValue: 15 }] },
-  { slug: 'nps-calculator', title: 'NPS Calculator', category: 'Investment Tools', description: 'Estimate NPS retirement corpus.', fields: [{ key: 'monthly', label: 'Monthly Contribution (₹)', defaultValue: 6000 }, { key: 'rate', label: 'Expected Return (%)', defaultValue: 10 }, { key: 'years', label: 'Years', defaultValue: 25 }] },
-  { slug: 'sukanya-samriddhi-calculator', title: 'Sukanya Samriddhi Calculator', category: 'Investment Tools', description: 'Calculate Sukanya Samriddhi maturity.', fields: [{ key: 'yearly', label: 'Yearly Deposit (₹)', defaultValue: 100000 }, { key: 'rate', label: 'Rate (%)', defaultValue: 8.2 }, { key: 'years', label: 'Years', defaultValue: 21 }] },
-  { slug: 'income-tax-calculator-india', title: 'Income Tax Calculator (India)', category: 'Income & Tax Tools', description: 'Estimate tax liability quickly.', fields: [{ key: 'income', label: 'Annual Income (₹)', defaultValue: 1200000 }, { key: 'deduction', label: 'Deductions (₹)', defaultValue: 150000 }] },
-  { slug: 'salary-calculator', title: 'Salary Calculator', category: 'Income & Tax Tools', description: 'Convert CTC to in-hand salary estimate.', fields: [{ key: 'ctc', label: 'Annual CTC (₹)', defaultValue: 1000000 }, { key: 'deduction', label: 'Annual Deductions (₹)', defaultValue: 120000 }] },
-  { slug: 'hra-calculator', title: 'HRA Calculator', category: 'Income & Tax Tools', description: 'Estimate HRA exemption.', fields: [{ key: 'basic', label: 'Basic Salary (₹/month)', defaultValue: 40000 }, { key: 'hra', label: 'HRA Received (₹/month)', defaultValue: 18000 }, { key: 'rent', label: 'Rent Paid (₹/month)', defaultValue: 22000 }] },
-  { slug: 'gratuity-calculator', title: 'Gratuity Calculator', category: 'Income & Tax Tools', description: 'Calculate gratuity entitlement.', fields: [{ key: 'salary', label: 'Last Drawn Basic+DA (₹)', defaultValue: 52000 }, { key: 'years', label: 'Years of Service', defaultValue: 9 }] },
-  { slug: 'epf-calculator', title: 'EPF Calculator', category: 'Income & Tax Tools', description: 'Estimate EPF corpus growth.', fields: [{ key: 'salary', label: 'Basic Salary (₹)', defaultValue: 35000 }, { key: 'rate', label: 'EPF Interest (%)', defaultValue: 8.15 }, { key: 'years', label: 'Years', defaultValue: 20 }] },
-  { slug: 'profit-margin-calculator', title: 'Profit Margin Calculator', category: 'Business Tools', description: 'Calculate gross/net margin.', fields: [{ key: 'revenue', label: 'Revenue (₹)', defaultValue: 500000 }, { key: 'cost', label: 'Cost (₹)', defaultValue: 350000 }] },
-  { slug: 'break-even-calculator', title: 'Break-even Calculator', category: 'Business Tools', description: 'Find units needed to break-even.', fields: [{ key: 'fixed', label: 'Fixed Cost (₹)', defaultValue: 200000 }, { key: 'price', label: 'Selling Price per Unit (₹)', defaultValue: 2000 }, { key: 'variable', label: 'Variable Cost per Unit (₹)', defaultValue: 1200 }] },
-  { slug: 'roi-calculator', title: 'ROI Calculator', category: 'Business Tools', description: 'Calculate return on investment.', fields: [{ key: 'gain', label: 'Net Gain (₹)', defaultValue: 80000 }, { key: 'cost', label: 'Cost of Investment (₹)', defaultValue: 250000 }] },
-  { slug: 'gst-return-calculator', title: 'GST Return Calculator', category: 'Business Tools', description: 'Estimate GST payable/input credit.', fields: [{ key: 'output', label: 'Output GST (₹)', defaultValue: 45000 }, { key: 'input', label: 'Input GST (₹)', defaultValue: 28000 }] },
-  { slug: 'net-worth-calculator', title: 'Net Worth Calculator', category: 'Advanced Tools', description: 'Calculate total assets minus liabilities.', fields: [{ key: 'assets', label: 'Total Assets (₹)', defaultValue: 3500000 }, { key: 'liabilities', label: 'Total Liabilities (₹)', defaultValue: 1200000 }] },
-  { slug: 'budget-planner', title: 'Budget Planner', category: 'Advanced Tools', description: 'Plan monthly budget surplus/deficit.', fields: [{ key: 'income', label: 'Monthly Income (₹)', defaultValue: 90000 }, { key: 'expense', label: 'Monthly Expense (₹)', defaultValue: 65000 }] },
-  { slug: 'savings-goal-calculator', title: 'Savings Goal Calculator', category: 'Advanced Tools', description: 'Compute monthly saving needed for target.', fields: [{ key: 'goal', label: 'Goal Amount (₹)', defaultValue: 1000000 }, { key: 'years', label: 'Years', defaultValue: 5 }, { key: 'rate', label: 'Expected Return (%)', defaultValue: 8 }] },
-  { slug: 'emergency-fund-calculator', title: 'Emergency Fund Calculator', category: 'Advanced Tools', description: 'Estimate ideal emergency corpus.', fields: [{ key: 'expense', label: 'Monthly Expense (₹)', defaultValue: 45000 }, { key: 'months', label: 'Coverage (Months)', defaultValue: 6 }] },
-  { slug: 'loan-comparison-tool', title: 'Loan Comparison Tool', category: 'Advanced Tools', description: 'Compare two loan offers quickly.', fields: [{ key: 'emiA', label: 'Loan A EMI (₹)', defaultValue: 21000 }, { key: 'emiB', label: 'Loan B EMI (₹)', defaultValue: 19800 }, { key: 'months', label: 'Tenure (Months)', defaultValue: 120 }] },
-  { slug: 'investment-comparison-tool', title: 'Investment Comparison Tool', category: 'Advanced Tools', description: 'Compare two investments side by side.', fields: [{ key: 'a', label: 'Investment A Maturity (₹)', defaultValue: 850000 }, { key: 'b', label: 'Investment B Maturity (₹)', defaultValue: 910000 }] },
-  { slug: 'age-calculator', title: 'Age Calculator', category: 'Extra Tools', description: 'Calculate age from birth year.', fields: [{ key: 'birthYear', label: 'Birth Year', defaultValue: 1995 }] },
-  { slug: 'percentage-calculator', title: 'Percentage Calculator', category: 'Extra Tools', description: 'Calculate percentage values.', fields: [{ key: 'part', label: 'Part', defaultValue: 45 }, { key: 'whole', label: 'Whole', defaultValue: 120 }] },
-  { slug: 'discount-calculator', title: 'Discount Calculator', category: 'Extra Tools', description: 'Calculate discount and final price.', fields: [{ key: 'price', label: 'Original Price (₹)', defaultValue: 2000 }, { key: 'discount', label: 'Discount (%)', defaultValue: 25 }] },
-  { slug: 'time-calculator', title: 'Time Calculator', category: 'Extra Tools', description: 'Convert hours to minutes and seconds.', fields: [{ key: 'hours', label: 'Hours', defaultValue: 8 }] },
-  { slug: 'unit-converter', title: 'Unit Converter', category: 'Extra Tools', description: 'Convert km to miles quickly.', fields: [{ key: 'km', label: 'Kilometers', defaultValue: 10 }] },
-  { slug: 'qr-code-generator', title: 'QR Code Generator', category: 'Extra Tools', description: 'Generate QR code links quickly.', fields: [{ key: 'text', label: 'Text / URL', type: 'text', defaultValue: 'https://www.bankifsccode.biz' }] },
+  ...CORE_TOOLS,
+  ...AUTO_TOOLS,
+  ...INVESTMENT_TOOLS,
+  ...HEALTH_TOOLS,
+  ...MATH_TOOLS,
+  ...UTILITY_TOOLS,
+  ...ADVANCED_TOOLS,
+  tool('neft-ifsc-search', 'NEFT IFSC Search Tool', 'Banking Tools', 'Find IFSC code for NEFT transfer safely.', TEXT_QUERY),
+  tool('rtgs-ifsc-search', 'RTGS IFSC Search Tool', 'Banking Tools', 'Validate IFSC for RTGS large-value payments.', TEXT_QUERY),
+  tool('imps-ifsc-search', 'IMPS IFSC Search Tool', 'Banking Tools', 'Quick IFSC check before IMPS transfer.', TEXT_QUERY),
+  tool('sbi-ifsc-code-mumbai-branch', 'SBI IFSC Code Mumbai Branch Finder', 'Banking Tools', 'Long-tail search page for SBI IFSC code Mumbai branch.', TEXT_QUERY),
+  tool('hdfc-ifsc-code-delhi', 'HDFC IFSC Code Delhi Finder', 'Banking Tools', 'Keyword-focused search page for HDFC IFSC code Delhi.', TEXT_QUERY),
+  tool('icici-bank-ifsc-near-me', 'ICICI Bank IFSC Near Me Finder', 'Banking Tools', 'Find ICICI bank IFSC near me by nearby city and branch.', TEXT_QUERY),
 ];
 
 export const TOOL_CATEGORY_ORDER = [
-  'Core Finance Calculators',
   'Banking Tools',
-  'Credit & Loan Tools',
+  'Financial Calculators',
+  'Auto Calculators',
   'Investment Tools',
-  'Income & Tax Tools',
-  'Business Tools',
+  'Health Calculators',
+  'Math Calculators',
+  'Utility Calculators',
   'Advanced Tools',
-  'Extra Tools',
 ];
 
-export const findToolBySlug = (slug?: string) => TOOL_CATALOG.find((tool) => tool.slug === slug);
+export const findToolBySlug = (slug?: string) => TOOL_CATALOG.find((toolItem) => toolItem.slug === slug);

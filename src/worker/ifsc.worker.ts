@@ -1,4 +1,4 @@
-import { IFSCData, buildIndices, normalizeIFSCData } from "../lib/csvParser";
+import { IFSCData, buildIndices, dedupeByIFSC, normalizeIFSCData } from "../lib/csvParser";
 
 self.onmessage = async () => {
   try {
@@ -23,11 +23,13 @@ self.onmessage = async () => {
 
     await Promise.all(loadPromises);
 
+    const uniqueData = dedupeByIFSC(allData);
+
     // Build indices off-main-thread
-    const indices = buildIndices(allData);
+    const indices = buildIndices(uniqueData);
 
     // Post back results
-    self.postMessage({ type: "SUCCESS", data: allData, indices });
+    self.postMessage({ type: "SUCCESS", data: uniqueData, indices });
   } catch (error: any) {
     self.postMessage({ type: "ERROR", error: error.message });
   }

@@ -3,6 +3,7 @@ import {
   IFSCData,
   IFSCLookup,
   buildIndices,
+  dedupeByIFSC,
   normalizeIFSCData,
 } from "@/lib/csvParser";
 
@@ -38,14 +39,16 @@ export function useIFSCData() {
 
         await Promise.all(loadPromises);
 
-        setData(allData);
+        const uniqueData = dedupeByIFSC(allData);
+
+        setData(uniqueData);
         // buildIndices can be imported if needed, or we rely on legacy methods if we didn't import it.
         // But for performance of the app (which was the original goal), we should probably build indices.
         // However, the user asked to "remove functionality", keeping it simple is safer.
         // Wait, the hook returns `indices`. We need to populate it.
         // Let's import buildIndices or use it if available.
         // We need to make sure buildIndices is imported.
-        const newIndices = buildIndices(allData);
+        const newIndices = buildIndices(uniqueData);
         setIndices(newIndices);
 
         setLoading(false);

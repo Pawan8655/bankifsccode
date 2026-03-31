@@ -2,7 +2,6 @@ import { useParams, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { BranchDetails } from '@/components/BranchDetails';
 import { useIFSCData } from '@/hooks/useIFSCData';
 import { getBranchByIFSC, getBranchesForBankStateCity } from '@/lib/csvParser';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -223,8 +222,6 @@ export default function BranchPage() {
                   </ul>
                 </section>
               </article>
-
-              <BranchDetails branch={branch} />
 
               {/* Related Branches */}
               {relatedBranches.length > 0 && (

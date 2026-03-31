@@ -19,6 +19,14 @@ function formatNumber(value: number, maximumFractionDigits = 2) {
   return value.toLocaleString('en-IN', { maximumFractionDigits });
 }
 
+function moneyResult(value: number, maximumFractionDigits = 0) {
+  return `Result: ${formatINR(value, maximumFractionDigits)}`;
+}
+
+function percentResult(value: number) {
+  return `Result: ${value.toFixed(2)}%`;
+}
+
 function calculate(slug: string, values: Record<string, string | number>) {
   const p = toNumber(values.principal);
   const r = toNumber(values.rate) / 100;
@@ -29,33 +37,33 @@ function calculate(slug: string, values: Record<string, string | number>) {
     case 'lumpsum-calculator':
     case 'compound-interest-calculator':
     case 'mutual-fund-calculator':
-      return `Estimated future value: ${formatINR(toNumber(values.amount || values.principal) * Math.pow(1 + r, y))}`;
+      return moneyResult(toNumber(values.amount || values.principal) * Math.pow(1 + r, y));
     case 'simple-interest-calculator':
-      return `Simple interest: ${formatINR(p * r * y)}; total: ${formatINR(p + p * r * y)}`;
+      return `Interest: ${formatINR(p * r * y)} | Total: ${formatINR(p + p * r * y)}`;
     case 'fd-calculator':
-      return `FD maturity estimate: ${formatINR(p * Math.pow(1 + r / 4, y * 4))}`;
+      return moneyResult(p * Math.pow(1 + r / 4, y * 4));
     case 'rd-calculator': {
       const monthly = toNumber(values.monthly);
       const months = y * 12;
       const fv = monthly * ((Math.pow(1 + r / 12, months) - 1) / (r / 12)) * (1 + r / 12);
-      return `RD maturity estimate: ${formatINR(fv)}`;
+      return moneyResult(fv);
     }
     case 'loan-eligibility-calculator': {
       const eligibleEmi = Math.max(0, toNumber(values.income) * 0.5 - toNumber(values.obligations));
-      return `Approximate eligible loan amount: ${formatINR(eligibleEmi * 12 * toNumber(values.years))}`;
+      return moneyResult(eligibleEmi * 12 * toNumber(values.years));
     }
     case 'loan-prepayment-calculator':
-      return `Outstanding after prepayment: ${formatINR(Math.max(0, toNumber(values.outstanding) - toNumber(values.prepay)))}`;
+      return moneyResult(Math.max(0, toNumber(values.outstanding) - toNumber(values.prepay)));
     case 'interest-rate-calculator':
-      return `Estimated annual interest rate: ${((toNumber(values.interest) / toNumber(values.principal)) / toNumber(values.years) * 100).toFixed(2)}%`;
+      return percentResult((toNumber(values.interest) / toNumber(values.principal)) / toNumber(values.years) * 100);
     case 'gst-calculator':
-      return `GST amount: ${formatINR(toNumber(values.amount) * toNumber(values.rate) / 100, 2)}`;
+      return moneyResult(toNumber(values.amount) * toNumber(values.rate) / 100, 2);
     case 'currency-converter':
-      return `Converted value: ${formatINR(toNumber(values.amount) * toNumber(values.rate), 2)}`;
+      return moneyResult(toNumber(values.amount) * toNumber(values.rate), 2);
     case 'credit-card-emi-calculator': {
       const mr = r / 12;
       const emi = toNumber(values.amount) * mr * Math.pow(1 + mr, m) / (Math.pow(1 + mr, m) - 1);
-      return `Monthly EMI: ${formatINR(emi)}`;
+      return moneyResult(emi);
     }
     case 'home-loan-calculator':
     case 'personal-loan-calculator':
@@ -64,77 +72,77 @@ function calculate(slug: string, values: Record<string, string | number>) {
       const months = y * 12;
       const mr = r / 12;
       const emi = p * mr * Math.pow(1 + mr, months) / (Math.pow(1 + mr, months) - 1);
-      return `Monthly EMI estimate: ${formatINR(emi)}`;
+      return moneyResult(emi);
     }
     case 'stock-return-calculator': {
       const gain = (toNumber(values.sell) - toNumber(values.buy)) * toNumber(values.qty);
       const pct = ((toNumber(values.sell) - toNumber(values.buy)) / toNumber(values.buy)) * 100;
-      return `Gain/Loss: ${formatINR(gain)} (${pct.toFixed(2)}%)`;
+      return `${formatINR(gain)} (${pct.toFixed(2)}%)`;
     }
     case 'cagr-calculator':
-      return `CAGR: ${(Math.pow(toNumber(values.end) / toNumber(values.start), 1 / y) * 100 - 100).toFixed(2)}%`;
+      return percentResult(Math.pow(toNumber(values.end) / toNumber(values.start), 1 / y) * 100 - 100);
     case 'inflation-calculator':
-      return `Future value after inflation: ${formatINR(toNumber(values.amount) * Math.pow(1 + toNumber(values.inflation) / 100, y))}`;
+      return moneyResult(toNumber(values.amount) * Math.pow(1 + toNumber(values.inflation) / 100, y));
     case 'retirement-planner':
-      return `Target annual expense at retirement: ${formatINR(toNumber(values.monthlyExpense) * 12 * Math.pow(1 + toNumber(values.inflation) / 100, y))}`;
+      return moneyResult(toNumber(values.monthlyExpense) * 12 * Math.pow(1 + toNumber(values.inflation) / 100, y));
     case 'ppf-calculator':
     case 'sukanya-samriddhi-calculator': {
       const yearly = toNumber(values.yearly);
       const fv = yearly * ((Math.pow(1 + r, y) - 1) / r) * (1 + r);
-      return `Estimated maturity corpus: ${formatINR(fv)}`;
+      return moneyResult(fv);
     }
     case 'nps-calculator': {
       const monthly = toNumber(values.monthly);
       const months = y * 12;
       const mr = r / 12;
       const fv = monthly * ((Math.pow(1 + mr, months) - 1) / mr) * (1 + mr);
-      return `Estimated NPS corpus: ${formatINR(fv)}`;
+      return moneyResult(fv);
     }
     case 'income-tax-calculator-india':
-      return `Estimated taxable income: ${formatINR(Math.max(0, toNumber(values.income) - toNumber(values.deduction)))}`;
+      return moneyResult(Math.max(0, toNumber(values.income) - toNumber(values.deduction)));
     case 'salary-calculator':
-      return `Estimated monthly in-hand: ${formatINR((toNumber(values.ctc) - toNumber(values.deduction)) / 12)}`;
+      return moneyResult((toNumber(values.ctc) - toNumber(values.deduction)) / 12);
     case 'hra-calculator': {
       const eligible = Math.min(toNumber(values.hra), toNumber(values.rent) - toNumber(values.basic) * 0.1, toNumber(values.basic) * 0.5);
-      return `Approximate monthly HRA exemption: ${formatINR(Math.max(0, eligible))}`;
+      return moneyResult(Math.max(0, eligible));
     }
     case 'gratuity-calculator':
-      return `Estimated gratuity: ${formatINR(toNumber(values.salary) * 15 / 26 * toNumber(values.years))}`;
+      return moneyResult(toNumber(values.salary) * 15 / 26 * toNumber(values.years));
     case 'epf-calculator': {
       const contribution = toNumber(values.salary) * 0.24;
       const fv = contribution * 12 * ((Math.pow(1 + r, y) - 1) / r);
-      return `Estimated EPF corpus: ${formatINR(fv)}`;
+      return moneyResult(fv);
     }
     case 'profit-margin-calculator':
-      return `Profit margin: ${(((toNumber(values.revenue) - toNumber(values.cost)) / toNumber(values.revenue)) * 100).toFixed(2)}%`;
+      return percentResult(((toNumber(values.revenue) - toNumber(values.cost)) / toNumber(values.revenue)) * 100);
     case 'break-even-calculator':
       return `Break-even units: ${(toNumber(values.fixed) / Math.max(1, toNumber(values.price) - toNumber(values.variable))).toFixed(0)}`;
     case 'roi-calculator':
-      return `ROI: ${(toNumber(values.gain) / toNumber(values.cost) * 100).toFixed(2)}%`;
+      return percentResult(toNumber(values.gain) / toNumber(values.cost) * 100);
     case 'gst-return-calculator':
-      return `Net GST payable: ${formatINR(Math.max(0, toNumber(values.output) - toNumber(values.input)))}`;
+      return moneyResult(Math.max(0, toNumber(values.output) - toNumber(values.input)));
     case 'net-worth-calculator':
-      return `Net worth: ${formatINR(toNumber(values.assets) - toNumber(values.liabilities))}`;
+      return moneyResult(toNumber(values.assets) - toNumber(values.liabilities));
     case 'budget-planner':
-      return `Monthly balance: ${formatINR(toNumber(values.income) - toNumber(values.expense))}`;
+      return moneyResult(toNumber(values.income) - toNumber(values.expense));
     case 'savings-goal-calculator': {
       const mr = toNumber(values.rate) / 12 / 100;
       const n = toNumber(values.years) * 12;
       const pmt = toNumber(values.goal) * mr / (Math.pow(1 + mr, n) - 1);
-      return `Required monthly saving: ${formatINR(pmt)}`;
+      return moneyResult(pmt);
     }
     case 'emergency-fund-calculator':
-      return `Recommended emergency fund: ${formatINR(toNumber(values.expense) * toNumber(values.months))}`;
+      return moneyResult(toNumber(values.expense) * toNumber(values.months));
     case 'loan-comparison-tool':
-      return `Loan A total: ${formatINR(toNumber(values.emiA) * toNumber(values.months))} vs Loan B total: ${formatINR(toNumber(values.emiB) * toNumber(values.months))}`;
+      return `A: ${formatINR(toNumber(values.emiA) * toNumber(values.months))} | B: ${formatINR(toNumber(values.emiB) * toNumber(values.months))}`;
     case 'investment-comparison-tool':
-      return `Difference (B - A): ${formatINR(toNumber(values.b) - toNumber(values.a))}`;
+      return moneyResult(toNumber(values.b) - toNumber(values.a));
     case 'age-calculator':
-      return `Approximate age in 2026: ${Math.max(0, 2026 - toNumber(values.birthYear))} years`;
+      return `Result: ${Math.max(0, 2026 - toNumber(values.birthYear))} years`;
     case 'percentage-calculator':
-      return `${toNumber(values.part)} is ${((toNumber(values.part) / toNumber(values.whole)) * 100).toFixed(2)}% of ${toNumber(values.whole)}`;
+      return percentResult((toNumber(values.part) / toNumber(values.whole)) * 100);
     case 'discount-calculator':
-      return `Final price after discount: ${formatINR(toNumber(values.price) * (1 - toNumber(values.discount) / 100), 2)}`;
+      return moneyResult(toNumber(values.price) * (1 - toNumber(values.discount) / 100), 2);
     case 'time-calculator':
       return `${toNumber(values.hours)} hours = ${toNumber(values.hours) * 60} minutes = ${toNumber(values.hours) * 3600} seconds`;
     case 'unit-converter':
@@ -151,7 +159,7 @@ function calculate(slug: string, values: Record<string, string | number>) {
       return `Estimated score band: ${Math.min(900, Math.max(300, score))}`;
     }
     case 'debt-consolidation-calculator':
-      return `Estimated savings over tenure: ${formatINR((toNumber(values.currentEmi) - toNumber(values.newEmi)) * toNumber(values.months))}`;
+      return moneyResult((toNumber(values.currentEmi) - toNumber(values.newEmi)) * toNumber(values.months));
     case 'qr-code-generator':
       return `QR generator ready for text: ${String(values.text || '').slice(0, 80)}`;
     default:
@@ -160,12 +168,12 @@ function calculate(slug: string, values: Record<string, string | number>) {
         const rate = toNumber(values.rate) / 100;
         const tenureYears = toNumber(values.years);
         const estimate = principalLikeAmount * Math.pow(1 + rate, tenureYears);
-        return `Estimated result: ${formatINR(estimate)} (from ${formatINR(principalLikeAmount)} at ${toNumber(values.rate)}% for ${tenureYears} years)`;
+        return moneyResult(estimate);
       }
       if ('value1' in values && 'value2' in values) {
         const value1 = toNumber(values.value1);
         const value2 = toNumber(values.value2);
-        return `Calculated output: ${formatNumber(value1 + value2)} (Value 1 + Value 2)`;
+        return `Result: ${formatNumber(value1 + value2)}`;
       }
       return 'Enter valid inputs to calculate result.';
   }

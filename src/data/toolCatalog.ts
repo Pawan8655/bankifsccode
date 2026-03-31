@@ -35,9 +35,6 @@ const tool = (slug: string, title: string, category: string, description: string
 });
 
 const CORE_TOOLS: ToolDefinition[] = [
-  tool('ifsc-code-finder', 'IFSC Code Finder', 'Banking Tools', 'Search branch-wise IFSC code finder India results.', TEXT_QUERY),
-  tool('micr-code-finder', 'MICR Code Finder', 'Banking Tools', 'Find MICR code online for cheque and ECS details.', TEXT_QUERY),
-  tool('bank-branch-details', 'Bank Branch Details India', 'Banking Tools', 'Get bank branch details India by bank, state, city, branch.', TEXT_QUERY),
   tool('emi-calculator', 'EMI Calculator', 'Financial Calculators', 'Calculate monthly EMI, interest and total repayment for any loan.'),
   tool('loan-calculator', 'Loan Calculator', 'Financial Calculators', 'Quick loan repayment planning with interest breakup.'),
   tool('interest-calculator', 'Interest Calculator', 'Financial Calculators', 'Simple interest planning for savings and loans.'),
@@ -97,12 +94,6 @@ export const TOOL_CATALOG: ToolDefinition[] = [
   ...MATH_TOOLS,
   ...UTILITY_TOOLS,
   ...ADVANCED_TOOLS,
-  tool('neft-ifsc-search', 'NEFT IFSC Search Tool', 'Banking Tools', 'Find IFSC code for NEFT transfer safely.', TEXT_QUERY),
-  tool('rtgs-ifsc-search', 'RTGS IFSC Search Tool', 'Banking Tools', 'Validate IFSC for RTGS large-value payments.', TEXT_QUERY),
-  tool('imps-ifsc-search', 'IMPS IFSC Search Tool', 'Banking Tools', 'Quick IFSC check before IMPS transfer.', TEXT_QUERY),
-  tool('sbi-ifsc-code-mumbai-branch', 'SBI IFSC Code Mumbai Branch Finder', 'Banking Tools', 'Long-tail search page for SBI IFSC code Mumbai branch.', TEXT_QUERY),
-  tool('hdfc-ifsc-code-delhi', 'HDFC IFSC Code Delhi Finder', 'Banking Tools', 'Keyword-focused search page for HDFC IFSC code Delhi.', TEXT_QUERY),
-  tool('icici-bank-ifsc-near-me', 'ICICI Bank IFSC Near Me Finder', 'Banking Tools', 'Find ICICI bank IFSC near me by nearby city and branch.', TEXT_QUERY),
 ];
 
 export const TOOL_CATEGORY_ORDER = [

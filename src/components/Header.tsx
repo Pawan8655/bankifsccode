@@ -18,7 +18,7 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-indigo-100/60 bg-white/85 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/70">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="group flex items-center gap-3">
@@ -34,7 +34,7 @@ export function Header() {
           </Link>
 
           <form
-            className="hidden w-72 items-center rounded-lg border bg-background px-3 py-1.5 md:flex"
+            className="hidden w-72 items-center rounded-xl border border-indigo-100 bg-white px-3 py-1.5 shadow-sm md:flex"
             onSubmit={(e) => {
               e.preventDefault();
               if (ifscQuery.trim()) {
@@ -53,7 +53,7 @@ export function Header() {
             />
           </form>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-2 lg:flex">
             {navLinks.map((link) => {
               const hashTarget = link.to.includes('#') ? `#${link.to.split('#')[1]}` : '';
               const isRoot = link.to === '/';
@@ -70,8 +70,8 @@ export function Header() {
                   key={link.to}
                   href={link.to}
                   className={cn(
-                    'rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
-                    isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    'rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200',
+                    isActive ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   )}
                 >
                   {link.label}
@@ -81,14 +81,14 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2 md:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
+            <Button variant="ghost" size="icon" className="rounded-xl border border-indigo-100 bg-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
         {mobileMenuOpen && (
-          <nav className="animate-fade-in border-t border-border py-4 md:hidden">
+          <nav className="animate-fade-in rounded-b-2xl border-t border-indigo-100 bg-white py-4 md:hidden">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <a

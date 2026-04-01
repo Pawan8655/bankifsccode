@@ -300,6 +300,47 @@ export default function Index() {
         </section>
 
         <section className="container mx-auto px-4 pb-10">
+          <h2 className="text-2xl font-semibold">🛍️ Products Category Wise</h2>
+          <p className="mt-2 text-sm text-slate-600">Credit Card, Bank Account, Demat Account, Loan, Insurance aur Mutual Fund products ko category image aur product image ke saath view karein.</p>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {PRODUCT_CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              const isActive = category.id === activeProductCategory;
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveProductCategory(category.id)}
+                  className={`overflow-hidden rounded-xl border bg-white text-left transition hover:border-primary/40 ${isActive ? 'ring-2 ring-primary/40' : ''}`}
+                >
+                  <img src={category.image} alt={`${category.name} category`} className="h-36 w-full object-cover" loading="lazy" />
+                  <div className="flex items-center gap-2 p-4">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <span className="font-semibold">{category.name}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-xl font-semibold">{visibleProducts.name} Products</h3>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              {visibleProducts.products.map((product) => (
+                <Card key={product.name} className="overflow-hidden">
+                  <img src={product.image} alt={product.name} className="h-44 w-full object-cover" loading="lazy" />
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold">{product.name}</h4>
+                    <p className="mt-2 text-sm text-slate-600">{product.description}</p>
+                    <Badge className="mt-3 inline-flex gap-1 bg-slate-800 text-white"><Eye className="h-3.5 w-3.5" /> View Product</Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-10">
           <Card><CardContent className="p-6">
             <h2 className="text-2xl font-semibold">🏦 About IFSC Code</h2>
             <p className="mt-3 text-sm text-slate-700">IFSC code (Indian Financial System Code) ek unique 11-character bank branch code hai. Online transaction mein correct IFSC use karna important hai taaki amount sahi branch mein safely transfer ho.</p>

@@ -79,6 +79,18 @@ export default function BranchPage() {
     ? `${branch.IFSC}, ${branch.Bank} IFSC code, ${branch.City} IFSC code, ${branch.State} bank IFSC code`
     : `${ifsc || ''} IFSC code, IFSC code branch details, bank IFSC code search`;
 
+  const faqSchema = branch ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: `What is the IFSC code of ${branch.Bank} ${branch.Branch}?`, acceptedAnswer: { '@type': 'Answer', text: `The IFSC code is ${branch.IFSC}.` } },
+      { '@type': 'Question', name: 'Can I use this IFSC for NEFT, RTGS and IMPS?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. IFSC is needed for beneficiary setup and routing in NEFT, RTGS and IMPS transfers.' } },
+      { '@type': 'Question', name: 'Why is MICR code used?', acceptedAnswer: { '@type': 'Answer', text: 'MICR is mainly used for cheque clearing and branch identification in cheque workflows.' } },
+      { '@type': 'Question', name: 'How to verify branch details before transfer?', acceptedAnswer: { '@type': 'Answer', text: 'Match bank, branch, IFSC, city and address together before submitting transfer.' } },
+      { '@type': 'Question', name: 'Can this page help for new beneficiary add?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. It provides quick reference details for safe and accurate beneficiary setup.' } },
+    ],
+  } : undefined;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEO
@@ -86,6 +98,7 @@ export default function BranchPage() {
         description={seoDescription}
         path={branch ? `/bank/${encodeURIComponent(branch.Bank)}/${encodeURIComponent(branch.State)}/${encodeURIComponent(branch.City)}/${encodeURIComponent(branch.Branch)}` : `/branch/${encodeURIComponent(ifsc || '')}`}
         keywords={seoKeywords}
+        schema={faqSchema}
       />
       <Header />
 
@@ -148,6 +161,7 @@ export default function BranchPage() {
                 </div>
 
                 <section className="space-y-4 text-sm md:text-base leading-7 text-foreground/90">
+                  <h2 className="text-xl font-semibold">Introduction</h2>
                   <p>
                     Looking for trusted branch details? You are on the right page. This listing gives complete and easy-to-read details for <strong>{branch.Bank}</strong> <strong>{branch.Branch}</strong> in <strong>{branch.City}</strong>, <strong>{branch.State}</strong>. On bankifsccode, our goal is simple: help users quickly verify bank details before making any money transfer. Whether you are sending salary, paying rent, transferring family support, or adding a new beneficiary, these branch details help reduce typing mistakes and transfer delays. Simple language mein bolein toh, yeh page aapka quick verification partner hai.
                   </p>
@@ -160,6 +174,18 @@ export default function BranchPage() {
                   <p>
                     IFSC code explanation: The IFSC for this branch is <strong>{branch.IFSC}</strong>. IFSC stands for Indian Financial System Code, an 11-character code used to identify a specific branch in electronic payment systems. Banks and payment apps use IFSC to route funds to the correct destination. You need IFSC while adding beneficiaries and while sending money through <strong>NEFT</strong>, <strong>RTGS</strong>, and <strong>IMPS</strong>. NEFT is useful for regular transfers, RTGS is often preferred for high-value real-time settlement, and IMPS is great for instant transfers 24x7.
                   </p>
+                  <h2 className="text-xl font-semibold">How to Use IFSC Code (Simple)</h2>
+                  <ul className="list-disc ml-5 space-y-1">
+                    <li>Beneficiary add page me account number ke saath IFSC enter karo.</li>
+                    <li>Bank name, branch name, city aur IFSC ko ek baar cross-check karo.</li>
+                    <li>Large transfer se pehle small test transfer karke confirm karo.</li>
+                  </ul>
+                  <h2 className="text-xl font-semibold">NEFT, RTGS, IMPS Explained</h2>
+                  <ul className="list-disc ml-5 space-y-1">
+                    <li><strong>NEFT:</strong> Regular transfers ke liye useful, batch-based settlement.</li>
+                    <li><strong>RTGS:</strong> High-value urgent transfers ke liye real-time settlement.</li>
+                    <li><strong>IMPS:</strong> Instant 24x7 transfer, small to medium payments ke liye best.</li>
+                  </ul>
                   <p>
                     MICR code explanation: MICR (Magnetic Ink Character Recognition) code helps identify bank branches mainly for cheque processing and clearing. The MICR listed here is <strong>{branch.MICR || 'NA'}</strong>. Even if many users today rely on UPI and online transfers, MICR is still relevant in cheque-related banking workflows. In short, IFSC is key for online fund transfer routing, while MICR is important for cheque system identification. Dono codes alag kaam karte hain, and both are useful for accurate banking records.
                   </p>

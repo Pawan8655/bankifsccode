@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, Landmark, MapPin, Search, Shield, Building, Map, GitBranch, CheckCircle2 } from 'lucide-react';
+import { Building2, Landmark, MapPin, Search, Shield, Building, Map, GitBranch, CheckCircle2, CreditCard, WalletCards, BriefcaseBusiness, HandCoins, ShieldCheck, ChartNoAxesCombined, Eye, Sparkles, ArrowRight } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Loader } from '@/components/Loader';
@@ -24,6 +24,69 @@ const POPULAR_SEARCHES = [
 
 const POPULAR_BANK_LINKS = ['State Bank of India', 'HDFC Bank', 'ICICI Bank', 'Punjab National Bank'];
 
+const PRODUCT_CATEGORIES = [
+  {
+    id: 'credit-card',
+    name: 'Credit Card',
+    icon: CreditCard,
+    image: 'https://images.unsplash.com/photo-1556742205-e10c9486e506?auto=format&fit=crop&w=900&q=80',
+    products: [
+      { name: 'Cashback Credit Card', description: 'Online shopping, utility bills aur fuel spends par cashback benefits.', image: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Travel Rewards Card', description: 'Air miles, lounge access aur hotel booking points ke saath premium travel card.', image: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=900&q=80' , featured: true },
+    ],
+  },
+  {
+    id: 'bank-account',
+    name: 'Bank Account',
+    icon: WalletCards,
+    image: 'https://images.unsplash.com/photo-1565514020179-026b92b2d201?auto=format&fit=crop&w=900&q=80',
+    products: [
+      { name: 'Savings Account', description: 'Daily banking aur interest earning ke liye zero balance/regular savings options.', image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Current Account', description: 'Business transactions ke liye high transaction limit aur overdraft support.', image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=80' },
+    ],
+  },
+  {
+    id: 'demat-account',
+    name: 'Demat Account',
+    icon: BriefcaseBusiness,
+    image: 'https://images.unsplash.com/photo-1640158615954-9f2f6086d8d6?auto=format&fit=crop&w=900&q=80',
+    products: [
+      { name: 'Basic Demat Account', description: 'Shares aur mutual fund units hold karne ke liye beginner-friendly demat option.', image: 'https://images.unsplash.com/photo-1569025690938-a00729c9e1df?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Trader Demat + Trading', description: 'Advanced charting aur low brokerage plans ke saath active trader package.', image: 'https://images.unsplash.com/photo-1642543492481-44e81e3914a0?auto=format&fit=crop&w=900&q=80' },
+    ],
+  },
+  {
+    id: 'loan',
+    name: 'Loan',
+    icon: HandCoins,
+    image: 'https://images.unsplash.com/photo-1616077167599-cad3639f0f54?auto=format&fit=crop&w=900&q=80',
+    products: [
+      { name: 'Home Loan', description: 'New home purchase aur balance transfer ke liye competitive home loan rates.', image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Personal Loan', description: 'Instant disbursal ke saath wedding, travel ya emergency ke liye unsecured loan.', image: 'https://images.unsplash.com/photo-1629721671030-a83edbb11211?auto=format&fit=crop&w=900&q=80' },
+    ],
+  },
+  {
+    id: 'insurance',
+    name: 'Insurance',
+    icon: ShieldCheck,
+    image: 'https://images.unsplash.com/photo-1633158829875-e5316a358c6f?auto=format&fit=crop&w=900&q=80',
+    products: [
+      { name: 'Health Insurance', description: 'Family floater plans with hospitalization cover, cashless hospitals aur add-ons.', image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Term Life Insurance', description: 'Affordable premium ke saath high life cover protection plan.', image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&q=80' },
+    ],
+  },
+  {
+    id: 'mutual-fund',
+    name: 'Mutual Fund',
+    icon: ChartNoAxesCombined,
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80',
+    products: [
+      { name: 'Equity Mutual Fund', description: 'Long-term wealth creation ke liye diversified equity scheme options.', image: 'https://images.unsplash.com/photo-1642052502050-3944ad47402f?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Debt Mutual Fund', description: 'Lower volatility aur short/medium term goals ke liye debt-oriented funds.', image: 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&w=900&q=80' },
+    ],
+  },
+] as const;
+
 const encode = (value: string) => encodeURIComponent(value);
 const buildBranchPath = (bank: string, state: string, city: string, branch: string) => `/bank/${encode(bank)}/${encode(state)}/${encode(city)}/${encode(branch)}`;
 
@@ -36,6 +99,7 @@ export default function Index() {
   const [city, setCity] = useState('');
   const [branch, setBranch] = useState('');
   const [ifscQuick, setIfscQuick] = useState('');
+  const [activeProductCategory, setActiveProductCategory] = useState(PRODUCT_CATEGORIES[0].id);
 
   const stats = useMemo(() => getOverallStats(data), [data]);
 
@@ -49,6 +113,14 @@ export default function Index() {
   }, [bank, state, city, indices]);
 
   const latestBlogs = useMemo(() => blogs.slice(0, 5), []);
+  const visibleProducts = useMemo(
+    () => PRODUCT_CATEGORIES.find((item) => item.id === activeProductCategory) ?? PRODUCT_CATEGORIES[0],
+    [activeProductCategory],
+  );
+  const featuredProduct = useMemo(
+    () => visibleProducts.products.find((product) => 'featured' in product && product.featured) ?? visibleProducts.products[0],
+    [visibleProducts],
+  );
 
   const onSearch = () => {
     if (!bank || !state || !city || !branch) return;
@@ -163,6 +235,69 @@ export default function Index() {
         </section>
 
         <section className="container mx-auto px-4 py-8 sm:py-10">{loading ? <Loader text="Loading IFSC data..." /> : <StatsCards stats={stats} variant="gradient" />}{error && <p className="mt-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}</section>
+
+        <section id="financial-products" className="container mx-auto px-4 pb-10">
+          <h2 className="text-2xl font-semibold">🛍️ Products Category Wise</h2>
+          <p className="mt-2 text-sm text-slate-600">Credit Card, Bank Account, Demat Account, Loan, Insurance aur Mutual Fund products ko category image aur product image ke saath view karein.</p>
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-xs font-medium text-indigo-700">
+            <Sparkles className="h-3.5 w-3.5" /> Premium curated products with quick visual comparison
+          </div>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {PRODUCT_CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              const isActive = category.id === activeProductCategory;
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveProductCategory(category.id)}
+                  className={`overflow-hidden rounded-xl border bg-white text-left transition hover:border-primary/40 ${isActive ? 'ring-2 ring-primary/40' : ''}`}
+                >
+                  <img src={category.image} alt={`${category.name} category`} className="h-36 w-full object-cover" loading="lazy" />
+                  <div className="flex items-center gap-2 p-4">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <span className="font-semibold">{category.name}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-xl font-semibold">{visibleProducts.name} Products</h3>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              {visibleProducts.products.map((product) => (
+                <Card key={product.name} className="overflow-hidden">
+                  <img src={product.image} alt={product.name} className="h-44 w-full object-cover" loading="lazy" />
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold">{product.name}</h4>
+                    <p className="mt-2 text-sm text-slate-600">{product.description}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Badge className="inline-flex gap-1 bg-slate-800 text-white"><Eye className="h-3.5 w-3.5" /> View Product</Badge>
+                      <Badge variant="secondary">Top Pick</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          <Card className="mt-6 overflow-hidden border-primary/20 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-900 text-white">
+            <CardContent className="grid gap-4 p-6 md:grid-cols-[1.4fr_1fr] md:items-center">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-indigo-200">Featured Product</p>
+                <h3 className="mt-2 text-2xl font-semibold">{featuredProduct.name}</h3>
+                <p className="mt-2 text-sm text-indigo-100">{featuredProduct.description}</p>
+                <div className="mt-4">
+                  <Link to="/tools" className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-indigo-50">
+                    Compare with Calculators <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+              <img src={featuredProduct.image} alt={`${featuredProduct.name} featured`} className="h-48 w-full rounded-xl object-cover md:h-56" loading="lazy" />
+            </CardContent>
+          </Card>
+        </section>
 
         <section className="container mx-auto px-4 pb-10">
           <Card><CardContent className="p-6">

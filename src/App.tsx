@@ -20,6 +20,8 @@ const EmiCalculator = lazy(() => import('./pages/EmiCalculator'));
 const SipCalculator = lazy(() => import('./pages/SipCalculator'));
 const Disclaimer = lazy(() => import('./pages/Disclaimer'));
 const GenericToolPage = lazy(() => import('./pages/GenericToolPage'));
+const BankHolidays = lazy(() => import('./pages/BankHolidays'));
+const BankComparison = lazy(() => import('./pages/BankComparison'));
 
 const queryClient = new QueryClient();
 
@@ -53,6 +55,8 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/disclaimer" element={<Disclaimer />} />
+            <Route path="/bank-holidays" element={<BankHolidays />} />
+            <Route path="/bank-comparison" element={<BankComparison />} />
             <Route path="/:toolSlug" element={<GenericToolPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

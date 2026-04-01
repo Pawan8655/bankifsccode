@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, Landmark, MapPin, Search, Shield, Building, Map, GitBranch, CheckCircle2, CreditCard, WalletCards, BriefcaseBusiness, HandCoins, ShieldCheck, ChartNoAxesCombined, Eye, Sparkles, ArrowRight } from 'lucide-react';
+import { Building2, Landmark, MapPin, Search, Shield, Building, Map, GitBranch, CheckCircle2, CreditCard, WalletCards, BriefcaseBusiness, HandCoins, ShieldCheck, ChartNoAxesCombined, Eye, Sparkles, ArrowRight, LocateFixed } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Loader } from '@/components/Loader';
@@ -100,6 +100,8 @@ export default function Index() {
   const [branch, setBranch] = useState('');
   const [ifscQuick, setIfscQuick] = useState('');
   const [activeProductCategory, setActiveProductCategory] = useState(PRODUCT_CATEGORIES[0].id);
+  const [nearMeLoading, setNearMeLoading] = useState(false);
+  const [nearMeMessage, setNearMeMessage] = useState('');
 
   const stats = useMemo(() => getOverallStats(data), [data]);
 
@@ -121,6 +123,13 @@ export default function Index() {
     () => visibleProducts.products.find((product) => 'featured' in product && product.featured) ?? visibleProducts.products[0],
     [visibleProducts],
   );
+  const ifscSuggestions = useMemo(() => {
+    const query = ifscQuick.trim().toUpperCase();
+    if (!query || query.length < 3) return [];
+    return data
+      .filter((item) => item.IFSC.includes(query) || item.Bank.toUpperCase().includes(query) || item.City.toUpperCase().includes(query))
+      .slice(0, 6);
+  }, [data, ifscQuick]);
 
   const onSearch = () => {
     if (!bank || !state || !city || !branch) return;
@@ -131,6 +140,41 @@ export default function Index() {
     const found = getBranchByIFSC(data, ifscQuick.trim());
     if (!found) return;
     navigate(buildBranchPath(found.Bank, found.State, found.City, found.Branch));
+  };
+
+  const onNearMeFinder = async () => {
+    if (!navigator.geolocation) {
+      setNearMeMessage('Geolocation browser me support nahi karta.');
+      return;
+    }
+    setNearMeLoading(true);
+    setNearMeMessage('');
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      try {
+        const { latitude, longitude } = position.coords;
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
+        const json = await response.json();
+        const detectedCity = String(json?.address?.city || json?.address?.town || json?.address?.state_district || '').toUpperCase();
+        if (!detectedCity) {
+          setNearMeMessage('City detect nahi ho paaya. Manual city select karein.');
+          return;
+        }
+        const matched = data.find((item) => item.City.toUpperCase() === detectedCity);
+        if (!matched) {
+          setNearMeMessage(`"${detectedCity}" ke liye branch nahi mili. Manual search try karein.`);
+          return;
+        }
+        navigate(buildBranchPath(matched.Bank, matched.State, matched.City, matched.Branch));
+      } catch {
+        setNearMeMessage('Near me finder temporarily unavailable. Thodi der baad try karein.');
+      } finally {
+        setNearMeLoading(false);
+      }
+    }, () => {
+      setNearMeLoading(false);
+      setNearMeMessage('Location permission allow karke phir se try karein.');
+    }, { enableHighAccuracy: false, timeout: 10000 });
   };
 
   return (
@@ -210,12 +254,23 @@ export default function Index() {
                   <Search className="mr-2 h-4 w-4" /> Search IFSC Code
                 </Button>
                 <div className="flex w-full max-w-md gap-2">
-                  <Input placeholder="Quick search by IFSC (e.g. SBIN0001234)" value={ifscQuick} onChange={(e) => setIfscQuick(e.target.value.toUpperCase())} className="h-11" />
+                  <div className="w-full">
+                    <Input list="ifsc-suggest" placeholder="Smart search by IFSC / bank / city" value={ifscQuick} onChange={(e) => setIfscQuick(e.target.value.toUpperCase())} className="h-11" />
+                    <datalist id="ifsc-suggest">
+                      {ifscSuggestions.map((item) => (
+                        <option key={item.IFSC} value={item.IFSC}>{item.Bank} - {item.Branch} ({item.City})</option>
+                      ))}
+                    </datalist>
+                  </div>
                   <Button variant="outline" onClick={onQuickIFSCSearch} disabled={!ifscQuick.trim()}>
                     Quick Search
                   </Button>
+                  <Button variant="secondary" onClick={onNearMeFinder} disabled={nearMeLoading}>
+                    <LocateFixed className="mr-1 h-4 w-4" /> Near me
+                  </Button>
                 </div>
               </div>
+              {nearMeMessage && <p className="mt-2 text-xs text-slate-600">{nearMeMessage}</p>}
 
               <div className="mt-4 flex flex-wrap gap-2 text-xs">
                 <span className="font-semibold text-slate-600">Popular searches:</span>
@@ -378,6 +433,10 @@ export default function Index() {
             ))}
           </div>
           <p className="mt-3 text-sm text-slate-600">Total tools available: <strong>{TOOL_CATALOG.length}+</strong></p>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm">
+            <Link to="/bank-holidays" className="rounded-full border bg-white px-4 py-2 hover:border-primary/40">📅 Bank Holidays 2026</Link>
+            <Link to="/bank-comparison" className="rounded-full border bg-white px-4 py-2 hover:border-primary/40">📊 Bank Comparison & SEO Resources</Link>
+          </div>
         </section>
 
         <section className="container mx-auto px-4 pb-10">
